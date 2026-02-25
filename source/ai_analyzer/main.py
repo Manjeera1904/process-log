@@ -10,7 +10,7 @@ from duplication_detector import detect_duplicates
 from dead_code_detector import detect_unused_files
 
 # Use GITHUB_WORKSPACE (root) or local fallback
-REPO_ROOT = os.environ.get('GITHUB_WORKSPACE', os.path.abspath(os.path.join(CURRENT_DIR, "..", "..")))
+REPO_ROOT = os.environ.get('GITHUB_WORKSPACE', os.path.abspath(os.path.join(CURRENT_DIR, "../../")))
 REPORT_DIR = os.path.join(REPO_ROOT, "source", "reports")
 REPORT_PATH = os.path.join(REPORT_DIR, "report.md")
 
