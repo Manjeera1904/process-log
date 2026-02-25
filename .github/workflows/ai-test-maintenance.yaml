@@ -24,12 +24,12 @@ jobs:
           python -m pip install --upgrade pip
           pip install langchain langchain-openai langchain-community openai
         
-      - name: Run
+      - name: Run AI Analyzer
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
         run: python source/ai_analyzer/main.py
         
-      - name: Comment
+      - name: Post AI Report
         uses: thollander/actions-comment-pull-request@v2
         if: github.event_name == 'pull_request'
         with:
