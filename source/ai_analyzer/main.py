@@ -32,14 +32,17 @@ def run_pipeline():
         for file in files:
             if file.endswith((".py", ".js", ".ts")):
                 path = os.path.join(root, file)
-                print(f"   📄 Analyzing file: {file}") # Track progress per file
+                # This line prints to the GitHub Logs so you can see it working
+                print(f"🔍 I found this file: {path}") 
                 
-                try:
-                    issues = analyze_file(path)
-                    if "No issues" not in issues and issues.strip():
-                        report.append(f"### 📄 {os.path.relpath(path, REPO_ROOT)}\n{issues}\n")
-                except Exception as e:
-                    print(f"   ❌ Error analyzing {file}: {e}")
+                issues = analyze_file(path)
+                
+                # CHANGE: Even if there are no issues, let's list the file in the report
+                relative_path = os.path.relpath(path, REPO_ROOT)
+                if "No issues" in issues or not issues.strip():
+                    report.append(f"### ✅ {relative_path}\nStatus: Checked. Code looks clean!\n")
+                else:
+                    report.append(f"### ❌ {relative_path}\n{issues}\n")
 
     # 2. Add Duplicates and Unused to the report
     duplicates = detect_duplicates(REPO_ROOT)
