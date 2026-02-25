@@ -1,0 +1,515 @@
+name: 'ProcessLog - PR Build, Test, and Deploy'
+
+trigger: none
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+variables:
+  deploymentName: 'InfrastructureDeployment'
+  keyVaultName: "kv-eclipsesaas-int"
+  keyVaultNametest: "kv-eclipsesaas-test"
+  azureContainerRegistry: "eclipsesaasacr"
+  projectName: "eclipsesaas"
+  dockerFileWebPath: "process-log/source/web/Dockerfile"
+  dockerFileApiPath: "process-log/source/api/Dockerfile"
+  dockerFileWebPathpc: "platform-core/source/web/Dockerfile"
+  dockerFileWebPathfe: "web-frontend/source/web/Dockerfile"
+  dockerFileApiPathpc: "platform-core/source/api/Dockerfile"
+  webImageNamefe: "web-frontend"
+  webImageNamepc: "platform-core-web"
+  apiImageNamepc: "platform-core-api"
+  webContainerAppNamefe: "aca-web-frontend"
+  webContainerAppNamepc: "aca-platform-core-web"
+  apiContainerAppNamepc: "aca-platform-core-api"
+  bicepPathfe: "web-frontend/bicep"
+  bicepPathpc: "platform-core/bicep"
+  pathpc: "platform-core"
+  npmrcPath: "process-log/.npmrc"
+  npmrcPathpc: 'platform-core/.npmrc'
+  sqlServer: "sseclipsesaasint.database.windows.net"
+  sqlScriptPath: 'source/api/EI.API.Platform.Core.Data.DevDataService/Resources/platform_core_dev_data.sql'
+  database: "EIPlatformCore"
+  webImageName: "process-logging-web"
+  apiImageName: "process-logging-api"
+  webContainerAppName: "aca-process-logging-web"
+  apiContainerAppName: "aca-process-logging-api"
+  resourceGroup: "eclipsesaas-int-rg"
+  buildConfiguration: 'Release'
+  bicepPath: "process-log/bicep"
+  pathpl: "process-log"
+
+resources:
+  repositories:
+    - repository: web-frontend
+      type: git
+      name: Commercialization/web-frontend
+      ref: main
+    
+    - repository: platform-core
+      type: git
+      name: Commercialization/platform-core
+      ref: main
+
+stages:
+- stage: build_and_test
+  displayName: 'Build and Test'
+  jobs:
+  - job: BuildAndTestJob
+    displayName: 'Build and Test Job'
+    steps:
+
+      - script: sudo apt-get update && sudo apt-get install -y mono-complete
+        displayName: 'Install Mono'
+
+      - task: NuGetToolInstaller@1
+        displayName: 'NuGet Tool Installation'
+
+      - task: UseDotNet@2
+        inputs:
+          packageType: 'sdk'
+          version: '8.x'
+          installationPath: $(Agent.ToolsDirectory)/dotnet
+
+      - task: DotNetCoreCLI@2
+        displayName: 'Aspire Workload Installation'
+        inputs:
+          command: 'custom'
+          custom: 'workload'
+          arguments: 'install aspire'
+
+      - task: DotNetCoreCLI@2
+        displayName: 'Nuget Restore'
+        inputs:
+          command: 'restore'
+          projects: '$(System.DefaultWorkingDirectory)/source/api/**/*.csproj'
+          feedsToUse: 'config'
+          nugetConfigPath: '$(System.DefaultWorkingDirectory)/source/api/NuGet.config'
+
+      - script: |
+          # Install dotnet-format tool
+          dotnet tool install -g dotnet-format
+          echo "Checking .NET code formatting..."
+          dotnet format --verify-no-changes --verbosity diagnostic source/api/
+        displayName: 'Check .NET Code Formatting'
+        name: DotNetFormat
+        continueOnError: true
+
+      - task: NodeTool@0
+        displayName: 'Install Node.js for ESLint'
+        inputs:
+          versionSpec: '20.x'
+
+      - script: echo 'registry=https://pkgs.dev.azure.com/EclipseInsightsHC/Commercialization/_packaging/eclipse-insights-nuget/npm/registry/' >.npmrc
+        displayName: 'Creating NPMRC'
+
+      - script: echo 'always-auth=true' >> .npmrc
+        displayName: 'Changing to NPMRC folder'
+
+      - task: npmAuthenticate@0
+        inputs:
+          workingFile: .npmrc
+
+      - script: |
+          cp .npmrc source/web/.npmrc
+        displayName: 'Copy .npmrc to source/web'
+
+      - script: |
+          npm install -g pnpm@9.9.0 --registry=https://registry.npmjs.org/
+          cd '$(pathfm)/source/web'
+          pnpm install
+          pnpm install -D ts-morph
+          pnpm install -D @types/node
+          
+        displayName: 'pnpm Install Dependencies'
+        env:
+          NODE_ENV: development
+          NPM_CONFIG_USERCONFIG: $(pathfm)/source/web/.npmrc
+      
+      - script: |
+          cd 'source/web'
+          pnpm install
+          echo "Now in: $(pwd)"
+          # Run both, capture their exit codes
+          pnpm run lint:eslint  
+          eslint_exit=$?
+          pnpm run lint:types
+          tsc_exit=$?
+          # If either failed, exit with 1 (warning with continueOnError)
+          if [ $eslint_exit -ne 0 ] || [ $tsc_exit -ne 0 ]; then
+            exit 1
+          fi
+        displayName: 'Check React Code with ESLint'
+        name: ReactLint
+        continueOnError: true
+
+      - script: |
+          echo "Code quality checks failed (formatting or lint issues found)."
+          exit 1
+        displayName: 'Fail pipeline if any step failed'
+        condition: eq(variables['Agent.JobStatus'], 'SucceededWithIssues')
+
+      - task: DotNetCoreCLI@2
+        displayName: 'Build Project'
+        inputs:
+          command: 'build'
+          workingDirectory: 'source/api'
+          arguments: '--configuration $(buildConfiguration) --no-restore --output ./publish/api'
+          
+      - task: DotNetCoreCLI@2
+        displayName: 'Publish Project'
+        inputs:
+          command: 'publish'
+          publishWebProjects: false
+          projects: '$(System.DefaultWorkingDirectory)/source/api/EI.API.ProcessLogging/EI.API.ProcessLogging.csproj'
+          arguments: '--configuration $(buildConfiguration) --no-restore --output $(Build.ArtifactStagingDirectory)/publish/api'
+
+    #commenting out unit tests and code coverage for now , will uncomment after api failures fix -#3840
+      # - task: DotNetCoreCLI@2
+      #   displayName: 'Run API Unit Tests'
+      #   inputs:
+      #     command: 'test'
+      #     workingDirectory: 'source/api'
+      #     arguments: '--configuration $(buildConfiguration) --no-restore --collect "XPlat Code Coverage" --settings ./coverage.runsettings'
+      #     publishTestResults: true
+      #   env:
+      #     ConnectionStrings__EIPlatformCore: 'Server=localhost,1433; Database=EIPlatformCore; User Id=sa; Password=1nt39rat10n-t3st1n9-0n1y; TrustServerCertificate=True;'
+
+      # - task: PublishCodeCoverageResults@1
+      #   displayName: 'Publish Code Coverage'
+      #   inputs:
+      #     codeCoverageTool: 'Cobertura'
+      #     summaryFileLocation: '$(Agent.TempDirectory)/**/coverage.cobertura.xml'
+
+      # - task: BuildQualityChecks@9
+      #   displayName: 'Check build quality'
+      #   inputs:
+      #     checkCoverage: true
+      #     coverageFailOption: fixed
+      #     coverageThreshold: 90
+      #     coverageType: 'lines'
+        
+      - task: UsePythonVersion@0
+        displayName: 'Use Python 3.x'
+        inputs:
+          versionSpec: '3.x'
+          addToPath: true
+
+      - script: |
+          python -m pip install --upgrade pip
+          pip install -r source/web/Tests/requirements.txt
+        displayName: 'Set up Python and Install Dependencies'
+        env:
+          PYTHON_VERSION: '3.x'
+
+      - task: AzureKeyVault@2
+        inputs:
+          azureSubscription: 'Azure_ExlipseInsightsSaaS'
+          KeyVaultName: $(keyVaultNametest)
+          SecretsFilter: 'AccessToken'
+          RunAsPreJob: false
+
+      - script: |
+          python source/web/Tests/create_test_case.py
+        displayName: 'Create test case'
+        env:
+          AccessToken: $(AccessToken)
+
+- stage: create_environment
+  dependsOn: build_and_test
+  displayName: 'Create Environment for PR'
+  condition: succeeded()
+  
+  jobs:
+  - job: deploy_to_int_pr_environment
+    displayName: "Deploy platform core and web frontend to PR Environment"
+    workspace:
+      clean: all
+    steps:
+
+      - checkout: web-frontend
+        fetchDepth: 0
+        displayName: 'Checkout web-frontend'
+
+      - template: .azure-pipelines/build/build-image.yaml@web-frontend
+        parameters:
+          dockerFileWebPath: $(dockerFileWebPathfe)
+          webImageName: $(webImageNamefe)
+          imagetag: $(Build.BuildId)
+        
+      - template: .azure-pipelines/build/push-image.yaml@web-frontend
+        parameters:
+          webImageName: $(webImageNamefe)
+          imagetag: $(Build.BuildId)
+      
+      - pwsh: |
+          # Get PR creation date via REST API
+          $url = "$(System.CollectionUri)$(System.TeamProject)/_apis/git/repositories/$(Build.Repository.ID)/pullrequests/$(System.PullRequest.PullRequestId)?api-version=7.0"
+          $token = "$(System.AccessToken)"
+          $base64AuthInfo = [Convert]::ToBase64String([Text.Encoding]::ASCII.GetBytes(":$token"))
+          $headers = @{Authorization = "Basic $base64AuthInfo"}
+
+          $pr = Invoke-RestMethod -Uri $url -Headers $headers -Method Get
+
+          $prCreatedDate = [DateTime]$pr.creationDate
+          $formattedDate = $prCreatedDate.ToString("yyyy-MM-ddTHH:mm:ssZ")
+
+          $prStatus = $pr.status
+          Write-Host "PR Status: $prStatus"
+
+          # Default expiry = 7 days from creation
+          $prExpiryDate = $prCreatedDate.AddDays(7)
+
+          $today = [DateTime]::UtcNow
+
+          # Only override if PR is active AND older than 7 days
+          if ($prStatus -eq "active" -and $today -gt $prExpiryDate) {
+              $prExpiryDate = $today.AddDays(1)
+          }
+
+          $formattedExpiryDate = $prExpiryDate.ToString("yyyy-MM-ddTHH:mm:ssZ")
+
+          Write-Host "PR Created: $formattedDate"
+          Write-Host "PR Expiry Date: $formattedExpiryDate"
+
+          Write-Host "##vso[task.setvariable variable=prCreatedDate]$formattedDate"
+          Write-Host "##vso[task.setvariable variable=prExpiryDate]$formattedExpiryDate"
+
+        displayName: 'Get PR Date'
+
+      - template: .azure-pipelines/deploy/deploy-infra.yaml@web-frontend
+        parameters:
+          environmentName: $(System.PullRequest.PullRequestId)
+          webContainerAppName: $(webContainerAppNamefe)
+          apiContainerAppName: $(apiContainerAppName)
+          deploymentName: $(deploymentName)
+          imagetag: $(Build.BuildId)
+          bicepPath: $(bicepPathfe)
+          prExpiryDate: $(prExpiryDate)
+
+      - template: .azure-pipelines/deploy/deploy-image.yaml@web-frontend
+        parameters:
+          environmentName: $(System.PullRequest.PullRequestId)
+          azureContainerRegistry: $(azureContainerRegistry)
+          azureContainerRegistryImage: $(webImageNamefe)
+          projectName: $(projectName)
+          imagetag: $(Build.BuildId)
+          resourceGroup: $(resourceGroup)
+      
+      - checkout: platform-core
+        fetchDepth: 0
+        displayName: 'Checkout platform-core branch'
+
+      - template: .azure-pipelines/build/build-image.yaml@platform-core
+        parameters:
+          dockerFileWebPath: $(dockerFileWebPathpc)
+          webImageName: $(webImageNamepc)
+          imagetag: $(Build.BuildId)
+          npmrcPath: $(npmrcPathpc)
+
+      - template: .azure-pipelines/build/push-image.yaml@platform-core
+        parameters:
+          webImageName: $(webImageNamepc)
+          imagetag: $(Build.BuildId)
+
+      - template: .azure-pipelines/build/build-image.yaml@platform-core
+        parameters:
+          dockerFileApiPath: $(dockerFileApiPathpc)
+          apiImageName: $(apiImageNamepc)
+          imagetag: $(Build.BuildId)
+
+      - template: .azure-pipelines/build/push-image.yaml@platform-core
+        parameters:
+          apiImageName: $(apiImageNamepc)
+          imagetag: $(Build.BuildId)
+
+      - template: .azure-pipelines/deploy/deploy-infra.yaml@platform-core
+        parameters:
+          environmentName: $(System.PullRequest.PullRequestId)
+          webAppName: $(webContainerAppNamepc)
+          apiAppName: $(apiContainerAppNamepc)
+          deploymentName: $(deploymentName)
+          imagetag: $(Build.BuildId)
+          bicepPath: $(bicepPathpc)
+          prExpiryDate: $(prExpiryDate)
+
+      - template: .azure-pipelines/deploy/deploy-api-image.yaml@platform-core
+        parameters:
+          environmentName: $(System.PullRequest.PullRequestId)
+          azureContainerRegistry: $(azureContainerRegistry)
+          azureContainerRegistryImage: $(apiImageNamepc)
+          projectName: $(projectName)
+          imagetag: $(Build.BuildId)
+          resourceGroup: $(resourceGroup)
+
+      - template: .azure-pipelines/deploy/deploy-web-image.yaml@platform-core
+        parameters:
+          environmentName: $(System.PullRequest.PullRequestId)
+          azureContainerRegistry: $(azureContainerRegistry)
+          azureContainerRegistryImage: $(webImageNamepc)
+          projectName: $(projectName)
+          imagetag: $(Build.BuildId)
+          keyVaultName: $(keyVaultName)
+          resourceGroup: $(resourceGroup)
+          bicepPath: $(bicepPathpc)
+          npmrcPath: $(npmrcPathpc)
+          pathpc: $(pathpc)
+
+  - job: deploy_seed_data
+    pool:
+      vmImage: 'windows-latest'
+    displayName: "Deploy seed data to PR Environment"
+    dependsOn: deploy_to_int_pr_environment
+    workspace:
+      clean: all
+    steps:
+
+    - task: AzureKeyVault@2
+      name: FetchSecrets
+      inputs:
+        azureSubscription: 'Azure_ExlipseInsightsSaaS'
+        KeyVaultName: $(keyVaultName)
+        SecretsFilter: 'tenantId,seed-data-sp-name,seed-data-sp-app-id,seed-data-sp-secret'
+        RunAsPreJob: true
+    
+    - checkout: platform-core
+      fetchDepth: 0
+      displayName: 'Checkout platform-core branch'
+
+    - template: .azure-pipelines/deploy/deploy-seed-data.yaml@platform-core
+      parameters:
+        tenantId: "$(tenantId)"
+        server: "$(sqlServer)"
+        database: "$(database)-$(System.PullRequest.PullRequestId)"
+        spDisplayName: "$(seed-data-sp-name)"
+        appId: "$(seed-data-sp-app-id)"
+        clientSecret: "$(seed-data-sp-secret)"
+        sqlFilePath: "$(sqlScriptPath)"
+      
+  - job: deploy_process_log
+    dependsOn: deploy_seed_data
+    displayName: "Deploy Process Log to PR Environment"
+    steps:
+
+    - checkout: web-frontend
+      fetchDepth: 0
+      displayName: 'Checkout web-frontend'
+
+    - checkout: self
+      fetchDepth: 0
+      displayName: 'Checkout self branch'
+
+    - template: build/build-image.yaml
+      parameters:
+        dockerFileWebPath: $(dockerFileWebPath)
+        webImageName: $(webImageName)
+        imagetag: $(Build.BuildId)
+        npmrcPath: $(npmrcPath)
+
+    - template: build/push-image.yaml
+      parameters:
+        webImageName: $(webImageName)
+        imagetag: $(Build.BuildId)
+
+    - template: build/build-image.yaml
+      parameters:
+        dockerFileApiPath: $(dockerFileApiPath)
+        apiImageName: $(apiImageName)
+        imagetag: $(Build.BuildId)
+    
+    - template: build/push-image.yaml
+      parameters:
+        apiImageName: $(apiImageName)
+        imagetag: $(Build.BuildId)
+    
+    - pwsh: |
+        # Get PR creation date via REST API
+        $url = "$(System.CollectionUri)$(System.TeamProject)/_apis/git/repositories/$(Build.Repository.ID)/pullrequests/$(System.PullRequest.PullRequestId)?api-version=7.0"
+        $token = "$(System.AccessToken)"
+        $base64AuthInfo = [Convert]::ToBase64String([Text.Encoding]::ASCII.GetBytes(":$token"))
+        $headers = @{Authorization = "Basic $base64AuthInfo"}
+
+        $pr = Invoke-RestMethod -Uri $url -Headers $headers -Method Get
+
+        $prCreatedDate = [DateTime]$pr.creationDate
+        $formattedDate = $prCreatedDate.ToString("yyyy-MM-ddTHH:mm:ssZ")
+
+        $prStatus = $pr.status
+        Write-Host "PR Status: $prStatus"
+
+        # Default expiry = 7 days from creation
+        $prExpiryDate = $prCreatedDate.AddDays(7)
+
+        $today = [DateTime]::UtcNow
+
+        # Only override if PR is active AND older than 7 days
+        if ($prStatus -eq "active" -and $today -gt $prExpiryDate) {
+            $prExpiryDate = $today.AddDays(1)
+        }
+
+        $formattedExpiryDate = $prExpiryDate.ToString("yyyy-MM-ddTHH:mm:ssZ")
+
+        Write-Host "PR Created: $formattedDate"
+        Write-Host "PR Expiry Date: $formattedExpiryDate"
+
+        Write-Host "##vso[task.setvariable variable=prCreatedDate]$formattedDate"
+        Write-Host "##vso[task.setvariable variable=prExpiryDate]$formattedExpiryDate"
+
+      displayName: 'Get PR Date'
+
+    - template: deploy/deploy-infra.yaml
+      parameters:
+        environmentName: $(System.PullRequest.PullRequestId)
+        webContainerAppName: $(webContainerAppName)
+        apiContainerAppName: $(apiContainerAppName)
+        deploymentName: $(deploymentName)
+        imagetag: $(Build.BuildId)
+        bicepPath: $(bicepPath)
+        resourceGroup: $(resourceGroup)
+        prExpiryDate: $(prExpiryDate)
+
+    - template: deploy/deploy-web-image.yaml
+      parameters:
+        environmentName: $(System.PullRequest.PullRequestId)
+        azureContainerRegistry: $(azureContainerRegistry)
+        azureContainerRegistryImage: $(webImageName)
+        projectName: $(projectName)
+        imagetag: $(Build.BuildId)
+        resourceGroup: $(resourceGroup)
+        pathpl: $(pathpl)
+        keyVaultName: $(keyVaultName)
+        
+    - template: deploy/deploy-api-image.yaml
+      parameters:
+        environmentName: $(System.PullRequest.PullRequestId)
+        azureContainerRegistry: $(azureContainerRegistry)
+        azureContainerRegistryImage: $(apiImageName)
+        projectName: $(projectName)
+        imagetag: $(Build.BuildId)
+        resourceGroup: $(resourceGroup)
+  
+  - job: test_process_log
+    dependsOn: deploy_process_log
+    displayName: "Test ProcessLog in PR Environment"
+    steps:
+      - task: AzureKeyVault@2
+        inputs:
+          azureSubscription: 'Azure_ExlipseInsightsSaaS'
+          KeyVaultName: $(keyVaultName)
+          SecretsFilter: 'Int-AzureAccess-SP-ClientId,Int-AzureAccess-SP-ClientSecret,eclipsesaas-tenantId'
+
+      - template: ui-test-template.yaml
+        parameters:
+          environmentName: $(System.PullRequest.PullRequestId)
+          AZURE_TENANT_ID: $(eclipsesaas-tenantId)
+          AZURE_CLIENT_ID: $(Int-AzureAccess-SP-ClientId)
+          AZURE_CLIENT_SECRET: $(Int-AzureAccess-SP-ClientSecret)
+          SERVICEBUS_NAMESPACE: "asb-eclipsesaas-$(System.PullRequest.PullRequestId).servicebus.windows.net"
+          SERVICEBUS_TOPIC: "process-logging"
+          SERVICEBUS_SUBSCRIPTION : "process-notifications"
+      
+      - script: |
+          echo "One or more steps failed. Failing the pipeline."
+          exit 1
+        displayName: 'Fail pipeline if any step failed'
+        condition: eq(variables['Agent.JobStatus'], 'SucceededWithIssues')

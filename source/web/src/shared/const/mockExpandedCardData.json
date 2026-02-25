@@ -1,0 +1,18 @@
+[
+  {
+    "insurancePayer": "Aetna Hospital",
+    "services": "ER Surgery",
+    "rate": "$212,456,000",
+    "summary": "Brief text provided by AI on the contract scope and any other relevant information. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
+    "dates": "03/25/2025 - 03/25/2026",
+    "paymentPolicy": "Monthly, before the 6th day"
+  },
+  {
+    "insurancePayer": "Blue Cross",
+    "services": "Outpatient Services",
+    "rate": "$82,000",
+    "summary": "Brief text provided by AI on the contract scope and any other relevant information. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
+    "dates": "05/01/2024 - 05/01/2025",
+    "paymentPolicy": "Quarterly payment before the 10th"
+  }
+]

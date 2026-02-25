@@ -1,0 +1,265 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>EI.API.ProcessLogging</name>
+    </assembly>
+    <members>
+        <member name="T:EI.API.ProcessLogging.Model.ActivityTypeV1">
+            <summary>
+              An Activity Type defines a specific type of process that can be logged by the Process Logging application.
+              Examples of Activity Types could include "Receive File", "Send File", "Perform FHIR Call", etc.
+            </summary>
+        </member>
+        <member name="P:EI.API.ProcessLogging.Model.ActivityTypeV1.Type">
+            <summary>
+              A unique code that identifies the type, used for readability and programmatic access.
+            </summary>
+        </member>
+        <member name="P:EI.API.ProcessLogging.Model.ActivityTypeV1.IsInbound">
+            <summary>
+              Flag that indicates that the activity was triggered by an external actor, for example an external system
+              pushing a file to an application on the platform, or making an API call to the platform.
+            </summary>
+        </member>
+        <member name="P:EI.API.ProcessLogging.Model.ActivityTypeV1.IsOutbound">
+            <summary>
+              Flag that indicates that the activity was triggered by an application on the platform, for example the
+              application exporting a file, or making an API call to an external system.
+            </summary>
+        </member>
+        <member name="P:EI.API.ProcessLogging.Model.ActivityTypeV1.Name">
+            <summary>
+              The name of the Activity Type for the specified <see cref="P:EI.API.Service.Rest.Helpers.Model.BaseTranslationDto.CultureCode"/>.
+            </summary>
+        </member>
+        <member name="P:EI.API.ProcessLogging.Model.ActivityTypeV1.Description">
+            <summary>
+              An optional description of the Activity Type for the specified <see cref="P:EI.API.Service.Rest.Helpers.Model.BaseTranslationDto.CultureCode"/>.
+            </summary>
+        </member>
+        <member name="T:EI.API.ProcessLogging.Model.FileProcessLogV1">
+            <summary>
+              A specific variant of a <see cref="T:EI.API.ProcessLogging.Model.ProcessLogV1"/> that is used to log the processing of a file.
+            </summary>
+        </member>
+        <member name="P:EI.API.ProcessLogging.Model.FileProcessLogV1.ProcessLogId">
+            <summary>
+              The ID of the <see cref="T:EI.API.ProcessLogging.Model.ProcessLogV1"/> that this File Process Log is associated with.
+            </summary>
+        </member>
+        <member name="P:EI.API.ProcessLogging.Model.FileProcessLogV1.FileName">
+            <summary>
+              The name of the file that this <see cref="T:EI.API.ProcessLogging.Model.ProcessLogV1">Process Log</see> is associated with.
+            </summary>
+        </member>
+        <member name="P:EI.API.ProcessLogging.Model.FileProcessLogV1.FilePath">
+            <summary>
+              The path of the file that this <see cref="T:EI.API.ProcessLogging.Model.ProcessLogV1">Process Log</see> is associated with, typically
+              a URI to the file in a Storage Account.
+            </summary>
+        </member>
+        <member name="P:EI.API.ProcessLogging.Model.FileProcessLogV1.FileSize">
+            <summary>
+              The (optional) size of the file in bytes.
+            </summary>
+        </member>
+        <member name="P:EI.API.ProcessLogging.Model.FileProcessLogV1.FileHash">
+            <summary>
+              The (optional) SHA3-256 hash of the file, used for file integrity checking.
+            </summary>
+        </member>
+        <member name="P:EI.API.ProcessLogging.Model.FileProcessLogV2.PurposeName">
+            <summary>
+              The lookup name of the purpose of this file (FK to FilePurpose).
+            </summary>
+        </member>
+        <member name="P:EI.API.ProcessLogging.Model.FileProcessLogV2.ProcessStatus">
+            <summary>
+              The lookup status of this file (FK to ProcessStatus).
+            </summary>
+        </member>
+        <member name="T:EI.API.ProcessLogging.Model.MessageLevelV1">
+            <summary>
+              Represents the severity of a message, used to categorize messages and determine how they should be
+              displayed and interpreted.
+            </summary>
+        </member>
+        <member name="P:EI.API.ProcessLogging.Model.MessageLevelV1.Level">
+            <summary>
+              A unique code that identifies the level, used for readability and programmatic access.
+            </summary>
+        </member>
+        <member name="P:EI.API.ProcessLogging.Model.MessageLevelV1.Name">
+            <summary>
+              The name of the Message Level for the specified <see cref="P:EI.API.Service.Rest.Helpers.Model.BaseTranslationDto.CultureCode"/>.
+            </summary>
+        </member>
+        <member name="P:EI.API.ProcessLogging.Model.MessageLevelV1.Description">
+            <summary>
+              An optional description of the Message Level for the specified <see cref="P:EI.API.Service.Rest.Helpers.Model.BaseTranslationDto.CultureCode"/>.
+            </summary>
+        </member>
+        <member name="T:EI.API.ProcessLogging.Model.ProcessLogMessageV1">
+            <summary>
+              Messages describing the actions that occurred while the <see cref="T:EI.API.ProcessLogging.Model.ProcessLogV1">Process</see> was active
+            </summary>
+        </member>
+        <member name="P:EI.API.ProcessLogging.Model.ProcessLogMessageV1.ProcessLogId">
+            <summary>
+              The ID of the <see cref="T:EI.API.ProcessLogging.Model.ProcessLogV1"/> that this Message is associated with.
+            </summary>
+        </member>
+        <member name="P:EI.API.ProcessLogging.Model.ProcessLogMessageV1.Level">
+            <summary>
+               The <see cref="P:EI.API.ProcessLogging.Model.MessageLevelV1.Level">Level</see> of message, indicating the severity or importance of the message.
+            </summary>
+        </member>
+        <member name="P:EI.API.ProcessLogging.Model.ProcessLogMessageV1.Message">
+            <summary>
+              The message text.
+            </summary>
+        </member>
+        <member name="P:EI.API.ProcessLogging.Model.ProcessLogMessageV1.MessageTimestamp">
+            <summary>
+              The UTC timestamp of when this message was created.
+            </summary>
+        </member>
+        <member name="P:EI.API.ProcessLogging.Model.ProcessLogMessageV2.FileProcessLogId">
+            <summary>
+              The ID of the <see cref="T:EI.API.ProcessLogging.Model.FileProcessLogV1"/> that this Message is associated with.
+            </summary>
+        </member>
+        <member name="P:EI.API.ProcessLogging.Model.ProcessLogV1.Type">
+            <summary>
+              The <see cref="P:EI.API.ProcessLogging.Model.ActivityTypeV1.Type">Activity Type</see> that this Process Log entry describes.
+            </summary>
+        </member>
+        <member name="P:EI.API.ProcessLogging.Model.ProcessLogV1.Status">
+            <summary>
+              The <see cref="P:EI.API.ProcessLogging.Model.ProcessStatusV1.Status">Process Status</see> of this Process Log entry.
+            </summary>
+        </member>
+        <member name="P:EI.API.ProcessLogging.Model.ProcessLogV1.StartTimestamp">
+            <summary>
+             The UTC timestamp of when this process was started.
+            </summary>
+        </member>
+        <member name="P:EI.API.ProcessLogging.Model.ProcessLogV1.LastUpdatedTimestamp">
+            <summary>
+              The UTC timestamp of the last time this Process Log had activity.
+            </summary>
+        </member>
+        <member name="T:EI.API.ProcessLogging.Model.ProcessStatusV1">
+            <summary>
+              Describes the status of a <see cref="T:EI.API.ProcessLogging.Model.ProcessLogV1"/>, for example "In Progress", "Completed", "Failed", etc.
+            </summary>
+        </member>
+        <member name="P:EI.API.ProcessLogging.Model.ProcessStatusV1.Status">
+            <summary>
+              The <see cref="P:EI.API.ProcessLogging.Model.ProcessLogV1.Status">Process Status</see> of this Process Log entry.
+            </summary>
+        </member>
+        <member name="P:EI.API.ProcessLogging.Model.ProcessStatusV1.Name">
+            <summary>
+              The name of the Status for the specified <see cref="P:EI.API.Service.Rest.Helpers.Model.BaseTranslationDto.CultureCode"/>.
+            </summary>
+        </member>
+        <member name="P:EI.API.ProcessLogging.Model.ProcessStatusV1.Description">
+            <summary>
+              An optional description of the Status for the specified <see cref="P:EI.API.Service.Rest.Helpers.Model.BaseTranslationDto.CultureCode"/>.
+            </summary>
+        </member>
+        <member name="T:EI.API.ProcessLogging.Model.X12FunctionalGroupV1">
+            <summary>
+              Represents an EDI X12 Functional Group, which is a collection of one or more
+              <see cref="T:EI.API.ProcessLogging.Model.X12TransactionSetV1">EDI X12 Transaction Sets</see>
+              within an <see cref="T:EI.API.ProcessLogging.Model.X12InterchangeV1">EDI X12 Interchange</see>.
+            </summary>
+        </member>
+        <member name="T:EI.API.ProcessLogging.Model.X12InterchangeV1">
+            <summary>
+              Represents an EDI X12 Functional Group, which is a collection of one or more
+              <see cref="T:EI.API.ProcessLogging.Model.X12TransactionSetV1">EDI X12 Transaction Sets</see>
+              within an <see cref="T:EI.API.ProcessLogging.Model.X12InterchangeV1">EDI X12 Interchange</see>.
+            </summary>
+        </member>
+        <member name="T:EI.API.ProcessLogging.Model.X12MessageV1">
+            <summary>
+              Messages describing the actions that occurred while the <see cref="T:EI.API.ProcessLogging.Model.ProcessLogV1">Process</see> was active
+            </summary>
+        </member>
+        <member name="P:EI.API.ProcessLogging.Model.X12MessageV1.X12InterchangeId">
+            <summary>
+              The ID of the <see cref="T:EI.API.ProcessLogging.Model.X12InterchangeV1"/> that this Message is associated with.
+            </summary>
+        </member>
+        <member name="P:EI.API.ProcessLogging.Model.X12MessageV1.X12FunctionalGroupId">
+            <summary>
+              The ID of the <see cref="T:EI.API.ProcessLogging.Model.X12FunctionalGroupV1"/> that this Message is associated with.
+              This only has a value if the message is associated with a Functional Group.
+            </summary>
+        </member>
+        <member name="P:EI.API.ProcessLogging.Model.X12MessageV1.X12TransactionSetId">
+            <summary>
+              The ID of the <see cref="T:EI.API.ProcessLogging.Model.X12TransactionSetV1"/> that this Message is associated with.
+              This only has a value if the message is associated with a Transaction Set.
+            </summary>
+        </member>
+        <member name="P:EI.API.ProcessLogging.Model.X12MessageV1.Level">
+            <summary>
+               The <see cref="P:EI.API.ProcessLogging.Model.MessageLevelV1.Level">Level</see> of message, indicating the severity or importance of the message.
+            </summary>
+        </member>
+        <member name="P:EI.API.ProcessLogging.Model.X12MessageV1.Message">
+            <summary>
+              The message text.
+            </summary>
+        </member>
+        <member name="P:EI.API.ProcessLogging.Model.X12MessageV1.MessageTimestamp">
+            <summary>
+              The UTC timestamp of when this message was created.
+            </summary>
+        </member>
+        <member name="T:EI.API.ProcessLogging.Model.X12StatusV1">
+            <summary>
+              Describes the status of a <see cref="T:EI.API.ProcessLogging.Model.X12InterchangeV1"/>, <see cref="T:EI.API.ProcessLogging.Model.X12FunctionalGroupV1"/>, or
+              <see cref="T:EI.API.ProcessLogging.Model.X12TransactionSetV1"/>, for example "In Progress", "Completed", "Failed", etc.
+            </summary>
+        </member>
+        <member name="P:EI.API.ProcessLogging.Model.X12StatusV1.Status">
+            <summary>
+              The Status of the X12 entity.
+              <seealso cref="P:EI.API.ProcessLogging.Model.X12InterchangeV1.Status"/>
+              <seealso cref="P:EI.API.ProcessLogging.Model.X12FunctionalGroupV1.Status"/>
+              <seealso cref="P:EI.API.ProcessLogging.Model.X12TransactionSetV1.Status"/>
+            </summary>
+        </member>
+        <member name="P:EI.API.ProcessLogging.Model.X12StatusV1.Name">
+            <summary>
+              The name of the Status for the specified <see cref="P:EI.API.Service.Rest.Helpers.Model.BaseTranslationDto.CultureCode"/>.
+            </summary>
+        </member>
+        <member name="P:EI.API.ProcessLogging.Model.X12StatusV1.Description">
+            <summary>
+              An optional description of the Status for the specified <see cref="P:EI.API.Service.Rest.Helpers.Model.BaseTranslationDto.CultureCode"/>.
+            </summary>
+        </member>
+        <member name="T:EI.API.ProcessLogging.Model.X12TransactionSetV1">
+            <summary>
+              Represents an EDI X12 Functional Group, which is a collection of one or more
+              <see cref="T:EI.API.ProcessLogging.Model.X12TransactionSetV1">EDI X12 Transaction Sets</see>
+              within an <see cref="T:EI.API.ProcessLogging.Model.X12InterchangeV1">EDI X12 Interchange</see>.
+            </summary>
+        </member>
+        <member name="P:ProcessLogWithFilesV1.Files">
+            <summary>
+            List of files associated with this process log.
+            </summary>
+        </member>
+        <member name="P:ProcessLogWithFilesV1.FileCount">
+            <summary>
+            Count of files associated with this process log.
+            </summary>
+        </member>
+    </members>
+</doc>

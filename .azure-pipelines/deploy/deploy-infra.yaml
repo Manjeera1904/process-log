@@ -1,0 +1,78 @@
+parameters:
+  environmentName: ""
+  webContainerAppName: ""
+  apiContainerAppName: ""
+  deploymentName: ""
+  bicepPath: "bicep"
+  imagetag: ''
+  prExpiryDate: ""
+
+steps:
+
+  - task: Bash@3
+    displayName: 'Install Bicep System-Wide'
+    inputs:
+      targetType: 'inline'
+      script: |
+        # Download and install Bicep to system path
+        sudo curl -Lo /usr/local/bin/bicep https://github.com/Azure/bicep/releases/latest/download/bicep-linux-x64
+        sudo chmod +x /usr/local/bin/bicep
+        
+        # Create symlink where AzureCLI task expects it
+        mkdir -p /home/vsts/work/_temp/.azclitask/bin
+        ln -sf /usr/local/bin/bicep /home/vsts/work/_temp/.azclitask/bin/bicep
+        
+        # Verify installation
+        echo "Bicep locations:"
+        which bicep
+        ls -la /usr/local/bin/bicep
+        ls -la /home/vsts/work/_temp/.azclitask/bin/bicep
+
+  - task: AzureCLI@2
+    condition: |
+      or(
+      eq('${{ parameters.environmentName }}', 'int'),
+      eq('${{ parameters.environmentName }}', 'dev'),
+      eq('${{ parameters.environmentName }}', 'test'),
+      eq('${{ parameters.environmentName }}', 'demo'),
+      eq('${{ parameters.environmentName }}', 'lab')
+      )
+    inputs:
+      azureSubscription: 'Azure_ExlipseInsightsSaaS'
+      scriptType: 'bash'
+      scriptLocation: 'inlineScript'
+      inlineScript: |        
+        export PATH=/usr/local/bin:$PATH
+        az deployment sub create \
+          --location eastus \
+          --name ${{ parameters.deploymentName }}-${{ parameters.environmentName }}-container \
+          --template-file $(System.DefaultWorkingDirectory)/${{ parameters.bicepPath }}/main.bicep \
+          --parameters $(System.DefaultWorkingDirectory)/${{ parameters.bicepPath }}/main.bicepparam \
+          --parameters environmentName=${{ parameters.environmentName }} \
+          --parameters azureContainerRegistryImageTag=${{ parameters.imagetag }}
+    displayName: "Create container and update domain for non-PR env"
+  
+  - task: AzureCLI@2
+    condition: |
+      and(
+        ne('${{ parameters.environmentName }}', 'int'),
+        ne('${{ parameters.environmentName }}', 'dev'),
+        ne('${{ parameters.environmentName }}', 'test'),
+        ne('${{ parameters.environmentName }}', 'demo'),
+        ne('${{ parameters.environmentName }}', 'lab')
+      )
+    inputs:
+      azureSubscription: 'Azure_ExlipseInsightsSaaS'
+      scriptType: 'bash'
+      scriptLocation: 'inlineScript'
+      inlineScript: |
+        export PATH=/usr/local/bin:$PATH
+        az deployment sub create \
+          --location eastus \
+          --name ${{ parameters.deploymentName }}-${{ parameters.environmentName }}-container \
+          --template-file $(System.DefaultWorkingDirectory)/${{ parameters.bicepPath }}/prmain.bicep \
+          --parameters $(System.DefaultWorkingDirectory)/${{ parameters.bicepPath }}/prmain.bicepparam \
+          --parameters environmentName=${{ parameters.environmentName }} \
+          --parameters azureContainerRegistryImageTag=${{ parameters.imagetag }} \
+          --parameters prExpiryDate=${{ parameters.prExpiryDate }}
+    displayName: "Create container and update domain for PR env"

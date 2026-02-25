@@ -1,0 +1,6 @@
+pytest
+requests
+selenium
+webdriver_manager
+pyautogui
+selenium-wire

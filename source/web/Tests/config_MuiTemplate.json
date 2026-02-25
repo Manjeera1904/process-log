@@ -1,0 +1,54 @@
+{
+  "common": {
+    "versionId": "1.0",
+    "versionId2": "2.0",
+    "versionId3": "3.0"
+  },
+  "tokenApi": {
+    "token": "",
+    "mtoken": "",
+    "idToken": ""
+  },
+  "tokenApi2": {
+    "token": "",
+    "mtoken": ""
+  },
+  "userApi": {
+    "id": null,
+    "updatedBy": "lavanya",
+    "rowVersion": "",
+    "tenantId": "",
+    "userName": "User_1732262604_6d80a402",
+    "displayName": "lavanyanj",
+    "isActive": true,
+    "userId": "",
+    "userId1": "",
+    "dateFrom": "2024-01-01",
+    "dateTo": "9999-12-12",
+    "EndDate": "",
+    "StartDate": ""
+  },
+  "userClientApi": {
+    "id": null,
+    "updatedBy": "lavanya",
+    "rowVersion": "",
+    "userId": "",
+    "clientId": "",
+    "startDate": "2024-01-01",
+    "endDate": "9999-12-12",
+    "dateFrom": "2024-01-01",
+    "dateTo": "9999-12-12",
+    "userClientId": "",
+    "userClientId1": "",
+    "isDefault": false
+  },
+  "login": {
+    "emailInput": "//input[@id='i0116']",
+    "nextButton": "//input[@id='idSIButton9']",
+    "passwordInput": "//input[@id='i0118']",
+    "signInButton": "//input[@id='idSIButton9' and @value='Sign in']",
+    "totpInput": "//input[@id='idTxtBx_SAOTCC_OTC']",
+    "continueButton": "//input[@id='idSubmit_SAOTCC_Continue']",
+    "staySignedInYesButton": "//input[@id='idSIButton9' and @value='Yes']"
+  }
+}

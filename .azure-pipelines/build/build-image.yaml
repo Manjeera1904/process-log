@@ -1,0 +1,56 @@
+parameters:
+  dockerFileWebPath: ''
+  webImageName: ''
+  dockerFileApiPath: ''
+  apiImageName: ''
+  imagetag: ''
+  npmrcPath: '.npmrc'
+  dockerFileSidecarPath: ''
+  sidecarImageName: ''
+
+steps:
+- ${{ if ne(parameters.webImageName, '') }}:
+  - script: echo 'registry=https://pkgs.dev.azure.com/EclipseInsightsHC/Commercialization/_packaging/eclipse-insights-nuget/npm/registry/' > ${{ parameters.npmrcPath}}
+    displayName: 'Creating NPMRC'
+
+  - script: echo 'always-auth=true' >> ${{ parameters.npmrcPath}}
+    displayName: 'Changing to NPMRC folder'
+
+  - task: npmAuthenticate@0
+    inputs:
+      workingFile: ${{ parameters.npmrcPath}}
+
+  - task: Docker@2
+    displayName: Build Web Image
+    inputs:
+      command: build
+      repository: ${{ parameters.webImageName }}
+      dockerfile: ${{ parameters.dockerFileWebPath }}
+      containerRegistry: 'SaaSContainerRegistry2'
+      tags: |
+        ${{ parameters.imagetag }}
+      arguments: '--secret id=npm,src=${{ parameters.npmrcPath}}'
+
+- ${{ if ne(parameters.apiImageName, '') }}:
+  - task: Docker@2
+    displayName: Build API Image
+    inputs:
+      command: build
+      repository: ${{ parameters.apiImageName }}
+      containerRegistry: 'SaaSContainerRegistry2'
+      dockerfile: ${{ parameters.dockerFileApiPath }}
+      tags: |
+        ${{ parameters.imagetag }}
+      arguments: '--build-arg NUGET_TOKEN=$(System.AccessToken)'
+
+- ${{ if ne(parameters.sidecarImageName, '') }}:
+  - task: Docker@2
+    displayName: Build Sidecar Image
+    inputs:
+      command: build
+      repository: ${{ parameters.sidecarImageName }}
+      containerRegistry: 'SaaSContainerRegistry2'
+      dockerfile: ${{ parameters.dockerFileSidecarPath }}
+      tags: |
+        ${{ parameters.imagetag }}
+      arguments: '--build-arg NUGET_TOKEN=$(System.AccessToken)'

@@ -1,0 +1,299 @@
+parameters:
+  containerAppNamefe: ''
+  containerAppNamepcapi: ''
+  containerAppNamepcui: ''
+  containerAppNamereapi: ''
+  containerAppNamereui: ''
+  containerAppNameplapi: ''
+  containerAppNameplui: ''
+  resourceGroup: ''
+  commonResourceGroup: ''
+  certificateNamefe: ''
+  certificateNamepcapi: ''
+  certificateNamepcui: ''
+  certificateNameplapi: ''
+  certificateNameplui: ''
+  certificateNamereapi: ''
+  certificateNamereui: ''
+  MyEnvironment: ''
+  newEnvName: ''
+  dnsZoneName: ''
+  sqlServerName: ''
+  sqlDatabaseName: ''
+  sqlDatabaseNamepl: ''
+  dnsrecordNamefe: ''
+  dnsrecordNamepcapi: ''
+  dnsrecordNamepcui: ''
+  dnsrecordNameplapi: ''
+  dnsrecordNameplui: ''
+  dnsrecordNamereapi: ''
+  dnsrecordNamereui: ''
+  redirectUriToRemove: ''
+  appRegistrationObjectId: ''
+  serviceBusNamespace: ''
+
+steps:
+
+- task: AzureCLI@2
+  displayName: 'Delete Container App and Then Certificates'
+  inputs:
+    azureSubscription: 'Azure_ExlipseInsightsSaaS'
+    scriptType: 'bash'
+    scriptLocation: 'inlineScript'
+    inlineScript: |
+      echo "Deleting container app"
+      for APP_NAME in "${{ parameters.containerAppNamefe }}" "${{ parameters.containerAppNamepcapi }}" "${{ parameters.containerAppNamepcui }}" "${{ parameters.containerAppNameplapi }}" "${{ parameters.containerAppNameplui }}" "${{ parameters.containerAppNamereui }}" "${{ parameters.containerAppNamereapi }}"; do
+        if [ -n "$APP_NAME" ]; then
+          echo "Checking if container app exists: $APP_NAME"
+          if az containerapp show \
+            --name "$APP_NAME" \
+            --resource-group "${{ parameters.resourceGroup }}" \
+            --output none 2>/dev/null; then
+            echo "Deleting container app: $APP_NAME"
+            if ! az containerapp delete \
+              --name "$APP_NAME" \
+              --resource-group "${{ parameters.resourceGroup }}" \
+              --yes; then
+              echo "##vso[task.logissue type=warning;]Failed to delete container app: $APP_NAME"
+              echo "##vso[task.complete result=SucceededWithIssues;]"
+            else
+              echo "Successfully deleted container app: $APP_NAME"
+            fi
+          else
+            echo "##vso[task.logissue type=warning;]Container app not found: $APP_NAME, skipping deletion."
+            echo "##vso[task.complete result=SucceededWithIssues;]"
+          fi
+        else
+          echo "No container app name provided, skipping."
+        fi
+      done
+
+      echo "Successfully initiated deletion of container app"
+      
+      echo "Waiting for container app to be fully deleted..."
+      MAX_WAIT_TIME=300
+      WAIT_INTERVAL=10
+      ELAPSED_TIME=0
+      
+      while [ $ELAPSED_TIME -lt $MAX_WAIT_TIME ]; do
+        if ! az containerapp show \
+          --name "${{ parameters.containerAppNamepcui }}" \
+          --resource-group "${{ parameters.resourceGroup }}" \
+          --output none 2>/dev/null; then
+          echo "Container app successfully deleted"
+          break
+        fi
+
+        echo "Container app still exists, waiting $WAIT_INTERVAL seconds... ($ELAPSED_TIME/$MAX_WAIT_TIME seconds elapsed)"
+        sleep $WAIT_INTERVAL
+        ELAPSED_TIME=$((ELAPSED_TIME + WAIT_INTERVAL))
+      done
+      
+      if [ $ELAPSED_TIME -ge $MAX_WAIT_TIME ]; then
+        echo "Timeout waiting for container app deletion after $MAX_WAIT_TIME seconds"
+        echo "##vso[task.logissue type=warning;]Timeout waiting for container app deletion after $MAX_WAIT_TIME seconds"
+        echo "##vso[task.complete result=SucceededWithIssues;]"
+      fi
+
+- task: AzureCLI@2
+  displayName: 'Delete Certificates and DNS Records'
+  inputs:
+    azureSubscription: 'Azure_ExlipseInsightsSaaS'
+    scriptType: 'bash'
+    scriptLocation: 'inlineScript'
+    inlineScript: |
+      echo "Checking for certificates to delete..."
+
+      for CERT_TO_DELETE in "${{ parameters.certificateNamefe }}" "${{ parameters.certificateNamepcapi }}" "${{ parameters.certificateNamepcui }}" "${{ parameters.certificateNameplapi }}" "${{ parameters.certificateNameplui }}" "${{ parameters.certificateNamereapi }}" "${{ parameters.certificateNamereui }}"; do
+        if [ -z "$CERT_TO_DELETE" ]; then
+          echo "No certificate name provided to delete."
+        else
+          echo "Attempting to delete certificate: $CERT_TO_DELETE"
+          if az containerapp env certificate delete \
+        --resource-group ${{ parameters.resourceGroup }} \
+        --name ${{ parameters.MyEnvironment }} \
+        --certificate "$CERT_TO_DELETE" \
+        --yes; then
+        echo "Successfully deleted certificate: $CERT_TO_DELETE"
+          else
+        echo "Certificate deletion failed for $CERT_TO_DELETE."
+        echo "##vso[task.logissue type=warning;]Certificate deletion failed for $CERT_TO_DELETE."
+        echo "##vso[task.complete result=SucceededWithIssues;]"
+          fi
+        fi
+      done
+
+      # Delete DNS records (CNAME and TXT) from parameters
+      echo "Deleting DNS records for all provided DNS record names..."
+
+      DNS_ZONE="${{ parameters.dnsZoneName }}"
+
+      for DNS_RECORD in "${{ parameters.dnsrecordNamefe }}" "${{ parameters.dnsrecordNamepcapi }}" "${{ parameters.dnsrecordNamepcui }}" "${{ parameters.dnsrecordNameplui }}" "${{ parameters.dnsrecordNameplapi }}" "${{ parameters.dnsrecordNamereui }}" "${{ parameters.dnsrecordNamereapi }}"; do
+        if [ -n "$DNS_RECORD" ]; then
+          # Delete CNAME record
+          if az network dns record-set cname show \
+            --resource-group ${{ parameters.commonResourceGroup }} \
+            --zone-name "$DNS_ZONE" \
+            --name "$DNS_RECORD" \
+            --output none 2>/dev/null; then
+
+            echo "Deleting CNAME record: $DNS_RECORD"
+            if ! az network dns record-set cname delete \
+              --resource-group ${{ parameters.commonResourceGroup }} \
+              --zone-name "$DNS_ZONE" \
+              --name "$DNS_RECORD" \
+              --yes; then
+              echo "##vso[task.logissue type=warning;]Failed to delete CNAME record: $DNS_RECORD"
+              echo "##vso[task.complete result=SucceededWithIssues;]"
+            else
+              echo "Successfully deleted CNAME record: $DNS_RECORD"
+            fi
+          else
+            echo "CNAME record not found: $DNS_RECORD"
+          fi
+
+          # Delete TXT record (asuid prefixed for Azure Container Apps)
+          TXT_RECORD_NAME="asuid.$DNS_RECORD"
+          if az network dns record-set txt show \
+            --resource-group ${{ parameters.commonResourceGroup }} \
+            --zone-name "$DNS_ZONE" \
+            --name "$TXT_RECORD_NAME" \
+            --output none 2>/dev/null; then
+
+            echo "Deleting TXT record: $TXT_RECORD_NAME"
+            if ! az network dns record-set txt delete \
+              --resource-group ${{ parameters.commonResourceGroup }} \
+              --zone-name "$DNS_ZONE" \
+              --name "$TXT_RECORD_NAME" \
+              --yes; then
+              echo "##vso[task.logissue type=warning;]Failed to delete TXT record: $TXT_RECORD_NAME"
+              echo "##vso[task.complete result=SucceededWithIssues;]"
+            else
+              echo "Successfully deleted TXT record: $TXT_RECORD_NAME"
+            fi
+          else
+            echo "TXT record not found: $TXT_RECORD_NAME"
+          fi
+        else
+          echo "No DNS record name provided in parameter, skipping."
+        fi
+      done
+
+      echo "All DNS cleanup operations completed successfully"
+
+- task: AzureCLI@2
+  displayName: 'Delete Service Bus Namespace'
+  inputs:
+    azureSubscription: 'Azure_ExlipseInsightsSaaS'
+    scriptType: 'bash'
+    scriptLocation: 'inlineScript'
+    inlineScript: |
+      SERVICEBUS_NAMESPACE="${{ parameters.serviceBusNamespace }}"
+      RESOURCE_GROUP="${{ parameters.resourceGroup }}"
+
+      # Empty check
+      if [ -z "$SERVICEBUS_NAMESPACE" ]; then
+        echo "Service Bus namespace name not provided, skipping deletion."
+        exit 0
+      fi
+
+      # Safety guard - only delete PR namespaces
+      if [[ ! "$SERVICEBUS_NAMESPACE" =~ ^asb-eclipsesaas- ]]; then
+        echo "Not a PR Service Bus namespace, skipping deletion: $SERVICEBUS_NAMESPACE"
+        exit 0
+      fi
+
+      echo "Checking if Service Bus namespace exists: $SERVICEBUS_NAMESPACE"
+
+      if az servicebus namespace show \
+        --name "$SERVICEBUS_NAMESPACE" \
+        --resource-group "$RESOURCE_GROUP" \
+        --output none 2>/dev/null; then
+
+        echo "Deleting Service Bus namespace: $SERVICEBUS_NAMESPACE"
+
+        if ! az servicebus namespace delete \
+          --name "$SERVICEBUS_NAMESPACE" \
+          --resource-group "$RESOURCE_GROUP"; then
+          echo "##vso[task.logissue type=warning;]Failed to delete Service Bus namespace: $SERVICEBUS_NAMESPACE"
+          echo "##vso[task.complete result=SucceededWithIssues;]"
+        else
+          echo "Successfully deleted Service Bus namespace: $SERVICEBUS_NAMESPACE"
+        fi
+      else
+        echo "##vso[task.logissue type=warning;]Service Bus namespace not found: $SERVICEBUS_NAMESPACE"
+        echo "##vso[task.complete result=SucceededWithIssues;]"
+      fi
+
+- task: AzureCLI@2
+  displayName: 'Delete SQL Databases'
+  inputs:
+    azureSubscription: 'Azure_ExlipseInsightsSaaS'
+    scriptType: 'bash'
+    scriptLocation: 'inlineScript'
+    inlineScript: |
+      databases=("${{ parameters.sqlDatabaseName }}" "${{ parameters.sqlDatabaseNamepl }}")
+      for db in "${databases[@]}"; do
+        echo "Deleting SQL Database: $db from server: ${{ parameters.sqlServerName }}"
+        if ! az sql db show \
+          --name "$db" \
+          --server "${{ parameters.sqlServerName }}" \
+          --resource-group "${{ parameters.resourceGroup }}" \
+          --output none 2>/dev/null; then
+          echo "##vso[task.logissue type=warning;]SQL Database not found: $db"
+          echo "##vso[task.complete result=SucceededWithIssues;]"
+        else
+          if ! az sql db delete \
+            --name "$db" \
+            --server "${{ parameters.sqlServerName }}" \
+            --resource-group "${{ parameters.resourceGroup }}" \
+            --yes; then
+            echo "##vso[task.logissue type=warning;]Failed to delete SQL Database: $db"
+            echo "##vso[task.complete result=SucceededWithIssues;]"
+          else
+            echo "Successfully initiated deletion of SQL Database: $db"
+          fi
+        fi
+      done
+
+- task: AzureCLI@2
+  displayName: 'Remove SPA Redirect URI'
+  inputs:
+    azureSubscription: 'Azure_ExlipseInsightsSaaS'
+    scriptType: 'bash'
+    scriptLocation: 'inlineScript'
+    inlineScript: |
+      # Set variables
+      APP_ID=${{ parameters.appRegistrationObjectId }}
+      URI_TO_REMOVE=${{ parameters.redirectUriToRemove }}
+
+      # Get the object ID of the application
+      OBJECT_ID=$(az ad app show --id "$APP_ID" --query "id" -o tsv)
+      echo "##vso[task.setvariable variable=OBJECT_ID]$OBJECT_ID"
+      echo "Application Object ID: $OBJECT_ID"
+
+      # Get current URIs
+      CURRENT_URIS=$(az ad app show --id "$APP_ID" --query "spa.redirectUris" -o json)
+      echo "Current SPA redirectUris: $CURRENT_URIS"
+
+      # Check if the URI exists
+      if echo "$CURRENT_URIS" | jq -e ". | index(\"$URI_TO_REMOVE\")" >/dev/null; then
+        # Remove the URI
+        UPDATED_SPA=$(echo "$CURRENT_URIS" | jq --arg uri "$URI_TO_REMOVE" '[.[] | select(. != $uri)]')
+        UPDATED_BODY="{\"spa\": {\"redirectUris\": $UPDATED_SPA}}"
+        echo "Updated SPA configuration: $UPDATED_BODY"
+
+        # Update the application using the object ID
+        if ! az rest --method PATCH \
+                --uri "https://graph.microsoft.com/v1.0/applications/$OBJECT_ID" \
+                --headers 'Content-Type=application/json' \
+                --body "$UPDATED_BODY"; then
+          echo "##vso[task.logissue type=warning;]Failed to remove SPA redirect URI: $URI_TO_REMOVE"
+          echo "##vso[task.complete result=SucceededWithIssues;]"
+        else
+          echo "Successfully removed URI: $URI_TO_REMOVE"
+        fi
+      else
+        echo "##vso[task.logissue type=warning;]SPA redirect URI not found: $URI_TO_REMOVE"
+        echo "##vso[task.complete result=SucceededWithIssues;]"
+      fi

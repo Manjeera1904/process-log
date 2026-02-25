@@ -1,0 +1,26 @@
+{
+  "columns": {
+    "type": "Type",
+    "id": "ID",
+    "description": "Description",
+    "client": "Client",
+    "source": "Source",
+    "processedOn": "Processed On",
+    "duration": "Duration",
+    "state": "State",
+    "disposition": "Disposition",
+    "filePresent": "Files",
+    "actionIcon": "Action"
+  },
+  "expandedCard": {
+    "payor": "Payor",
+    "services": "Services",
+    "rate": "Rate",
+    "dates": "Dates",
+    "summary": "Summary",
+    "paymentPolicy": "Payment Policy"
+  },
+  "filters": {
+    "status": "Status"
+  }
+}

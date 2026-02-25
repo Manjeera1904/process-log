@@ -1,0 +1,427 @@
+name: 'Deploy Process Log Resources and Application' 
+
+trigger:
+  branches:
+    include:
+      - main
+
+parameters:
+  - name: deployToDev
+    displayName: 'Deploy to Dev?'
+    type: string
+    default: 'No'
+    values:
+      - 'Yes'
+      - 'No'
+
+variables:
+  azureSubscriptionName: 'Azure_ExlipseInsightsSaaS'
+  deploymentName: 'InfrastructureDeployment'
+  dockerFileApiPath: "$(System.DefaultWorkingDirectory)/source/api/Dockerfile"
+  azureContainerRegistry: "eclipsesaasacr"
+  projectName: "eclipsesaas"
+  dockerFileWebPath: "$(System.DefaultWorkingDirectory)/source/web/Dockerfile"
+  webImageName: "process-logging-web"
+  apiImageName: "process-logging-api"
+  webContainerAppName: "aca-process-logging-web"
+  apiContainerAppName: "aca-process-logging-api"
+  pathpl: "$(System.DefaultWorkingDirectory)"
+  dockerFileSidecarPath: "$(System.DefaultWorkingDirectory)/bicep/nginx/Dockerfile"
+  dockerbuildContext: "$(System.DefaultWorkingDirectory)/bicep/nginx"
+  sidecarImageName: "process-log-sidecar"
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+resources:
+  repositories:
+    - repository: QA
+      type: git
+      name: Commercialization/QA
+      ref: main
+
+stages:
+- stage: build_processlog_web_api
+  displayName: API and Web - Build and Push Image
+  jobs:
+    - job: BuildAndPushJob
+      displayName: 'Build and Push Job'
+      steps:
+
+      - template: build/build-image.yaml
+        parameters:
+          dockerFileWebPath: $(dockerFileWebPath)
+          webImageName: $(webImageName)
+          imagetag: $(Build.BuildId)
+
+      - template: build/push-image.yaml
+        parameters:
+          webImageName: $(webImageName)
+          imagetag: $(Build.BuildId)
+
+      - template: build/build-image.yaml
+        parameters:
+          dockerFileSidecarPath: $(dockerFileSidecarPath)
+          sidecarImageName: $(sidecarImageName)
+          imagetag: $(Build.BuildId)
+
+      - template: build/push-image.yaml
+        parameters:
+          sidecarImageName: $(sidecarImageName)
+          imagetag: $(Build.BuildId)
+
+      - template: build/build-image.yaml
+        parameters:
+          dockerFileApiPath: $(dockerFileApiPath)
+          apiImageName: $(apiImageName)
+          imagetag: $(Build.BuildId)
+
+      - template: build/push-image.yaml
+        parameters:
+          apiImageName: $(apiImageName)
+          imagetag: $(Build.BuildId)
+          
+      - script: |
+          echo "One or more steps failed. Failing the pipeline."
+          exit 1
+        displayName: 'Fail pipeline if any step failed'
+        condition: eq(variables['Agent.JobStatus'], 'SucceededWithIssues')
+
+- stage: deploy_processlog_dev
+  displayName: Dev-Deploy Environment
+  lockBehavior: sequential
+  dependsOn: build_processlog_web_api
+  condition: and(succeeded(), eq('${{ parameters.deployToDev }}', 'Yes'))
+  jobs:
+    - deployment: Deploy_to_dev
+      displayName: "Deploy Process Log(Dev)"
+      environment: dev
+      timeoutInMinutes: 60
+      workspace:
+        clean: all
+      strategy:
+        runOnce:
+          deploy:
+            steps:
+
+            - checkout: self
+              fetchDepth: 0
+
+            - template: deploy/deploy-infra.yaml
+              parameters:
+                environmentName: dev
+                webContainerAppName: $(webContainerAppName)
+                apiContainerAppName: $(apiContainerAppName)
+                deploymentName: $(deploymentName)
+                imagetag: $(Build.BuildId)
+
+            - template: deploy/deploy-api-image.yaml
+              parameters:
+                environmentName: dev
+                azureContainerRegistry: $(azureContainerRegistry)
+                azureContainerRegistryImage: $(apiImageName)
+                projectName: $(projectName)
+                imagetag: $(Build.BuildId)
+                resourceGroup: 'eclipsesaas-dev-rg'
+
+            - template: deploy/deploy-web-image.yaml
+              parameters:
+                environmentName: dev
+                azureContainerRegistry: $(azureContainerRegistry)
+                azureContainerRegistryImage: $(webImageName)
+                projectName: $(projectName)
+                imagetag: $(Build.BuildId)
+                keyVaultName: kv-eclipsesaas-dev
+                resourceGroup: 'eclipsesaas-dev-rg'
+                pathpl: $(pathpl)
+
+            - script: |
+                echo "One or more steps failed. Failing the pipeline."
+                exit 1
+              displayName: 'Fail pipeline if any step failed'
+              condition: eq(variables['Agent.JobStatus'], 'SucceededWithIssues')
+
+- stage: deploy_processlog_int
+  displayName: Int - Deploy Environment
+  dependsOn: build_processlog_web_api
+  condition: and(succeeded('build_processlog_web_api'), eq(variables['Build.SourceBranchName'], 'main'))
+  jobs:
+    - deployment: Deploy_to_int
+      displayName: "Deploy Process Log (Int)"
+      environment: int
+      timeoutInMinutes: 60
+      workspace:
+        clean: all
+      strategy:
+        runOnce:
+          deploy:
+            steps:
+
+            - checkout: self
+              fetchDepth: 0
+
+            - template: deploy/deploy-infra.yaml
+              parameters:
+                environmentName: int
+                webContainerAppName: $(webContainerAppName)
+                apiContainerAppName: $(apiContainerAppName)
+                deploymentName: $(deploymentName)
+                imagetag: $(Build.BuildId)
+
+            - template: deploy/deploy-api-image.yaml
+              parameters:
+                environmentName: int
+                azureContainerRegistry: $(azureContainerRegistry)
+                azureContainerRegistryImage: $(apiImageName)
+                projectName: $(projectName)
+                imagetag: $(Build.BuildId)
+                resourceGroup: 'eclipsesaas-int-rg'
+                sideCarImageName: $(sidecarImageName)
+
+            - template: deploy/deploy-web-image.yaml
+              parameters:
+                environmentName: int
+                azureContainerRegistry: $(azureContainerRegistry)
+                azureContainerRegistryImage: $(webImageName)
+                projectName: $(projectName)
+                imagetag: $(Build.BuildId)
+                keyVaultName: kv-eclipsesaas-int
+                resourceGroup: 'eclipsesaas-int-rg'
+                pathpl: $(pathpl)
+                sideCarImageName: $(sidecarImageName)
+
+            - script: |
+                echo "One or more steps failed. Failing the pipeline."
+                exit 1
+              displayName: 'Fail pipeline if any step failed'
+              condition: eq(variables['Agent.JobStatus'], 'SucceededWithIssues')
+
+- stage: deploy_processlog_test
+  displayName: Test - Deploy Environment
+  lockBehavior: sequential
+  dependsOn: deploy_processlog_int
+  condition: and(succeeded('deploy_processlog_int'), eq(variables['Build.SourceBranchName'], 'main'))
+  jobs:
+    - job: run_integration_tests
+      displayName: "Run Integration Tests"
+      workspace:
+        clean: all
+      steps:
+
+        - checkout: QA
+          displayName: 'Checkout QA Test Repo'
+
+        - task: AzureCLI@2
+          inputs:
+            azureSubscription: "Azure_ExlipseInsightsSaaS"
+            scriptType: "pscore"
+            scriptLocation: "inlineScript"
+            inlineScript: |
+              $keyVaultName = "kv-eclipsesaas-test"
+              
+              # Initialize an array to hold the secrets
+              $secretsArray = @()
+
+              # List all secrets in the Key Vault
+              $secrets = az keyvault secret list --vault-name $keyVaultName --query "[].id" -o tsv
+
+              # Loop through each secret and check if it starts with "eclipse-testautomation-user"
+              foreach ($secret in $secrets) {
+                  $secretName = [System.IO.Path]::GetFileName($secret)
+                  if ($secretName -like "eclipse-testautomation-user*") {
+                      # Retrieve the secret value
+                      $secretValue = az keyvault secret show --vault-name $keyVaultName --name $secretName --query "value" -o tsv
+                      
+                      # Create a custom object for the secret
+                      $secretObject = [PSCustomObject]@{
+                          SecretName = $secretName
+                          SecretValue = $secretValue | ConvertFrom-Json
+                      }
+                      # Add the secret object to the array
+                      $secretsArray += $secretObject
+                  }
+              }
+
+              # Convert the array to JSON and save it to a file in the specified folder
+              $secretsJson = $secretsArray | ConvertTo-Json -Depth 3
+              echo "Running UI tests..."
+          displayName: 'Run UI tests'
+
+    - deployment: Deploy_to_test
+      displayName: "Deploy Process Log (Test)"
+      dependsOn: run_integration_tests
+      environment: test
+      timeoutInMinutes: 60
+      workspace:
+        clean: all
+      strategy:
+        runOnce:
+          deploy:
+            steps:
+
+            - checkout: self
+              fetchDepth: 0
+
+            - template: deploy/deploy-infra.yaml
+              parameters:
+                environmentName: test
+                webContainerAppName: $(webContainerAppName)
+                apiContainerAppName: $(apiContainerAppName)
+                deploymentName: $(deploymentName)
+                imagetag: $(Build.BuildId)
+
+            - template: deploy/deploy-api-image.yaml
+              parameters:
+                environmentName: test
+                azureContainerRegistry: $(azureContainerRegistry)
+                azureContainerRegistryImage: $(apiImageName)
+                projectName: $(projectName)
+                imagetag: $(Build.BuildId)
+                resourceGroup: 'eclipsesaas-test-rg'
+
+            - template: deploy/deploy-web-image.yaml
+              parameters:
+                environmentName: test
+                azureContainerRegistry: $(azureContainerRegistry)
+                azureContainerRegistryImage: $(webImageName)
+                projectName: $(projectName)
+                imagetag: $(Build.BuildId)
+                keyVaultName: kv-eclipsesaas-test
+                resourceGroup: 'eclipsesaas-test-rg'
+                pathpl: $(pathpl)
+
+            - task: AzureKeyVault@2
+              inputs:
+                azureSubscription: 'Azure_ExlipseInsightsSaaS'
+                KeyVaultName: kv-eclipsesaas-test
+                SecretsFilter: 'Test-AzureAccess-SP-ClientId,Test-AzureAccess-SP-ClientSecret,eclipsesaas-tenantId'
+
+            - template: ui-test-template.yaml
+              parameters:
+                environmentName: test
+                AZURE_TENANT_ID: $(eclipsesaas-tenantId)
+                AZURE_CLIENT_ID: $(Test-AzureAccess-SP-ClientId)
+                AZURE_CLIENT_SECRET: $(Test-AzureAccess-SP-ClientSecret)
+                SERVICEBUS_NAMESPACE: "asb-eclipsesaas-test.servicebus.windows.net"
+                SERVICEBUS_TOPIC: "process-logging"
+                SERVICEBUS_SUBSCRIPTION_1 : "process-notifications"
+                SERVICEBUS_SUBSCRIPTION_2 : "rule-events"
+                SERVICEBUS_TOPIC_APPLICATION: "application-events"
+
+            - script: |
+                echo "One or more steps failed. Failing the pipeline."
+                exit 1
+              displayName: 'Fail pipeline if any step failed'
+              condition: eq(variables['Agent.JobStatus'], 'SucceededWithIssues')
+
+- stage: deploy_processlog_demo
+  displayName: Demo - Deploy Environment
+  lockBehavior: sequential
+  dependsOn: deploy_processlog_test
+  condition: eq(variables['Build.SourceBranchName'], 'main')
+  jobs:
+    - deployment: Deploy_to_demo
+      displayName: "Deploy process log (Demo)"
+      environment: demo
+      timeoutInMinutes: 60
+      workspace:
+        clean: all
+      strategy:
+        runOnce:
+          deploy:
+            steps:
+
+            - checkout: self
+              fetchDepth: 0
+
+            - template: deploy/deploy-infra.yaml
+              parameters:
+                environmentName: demo
+                webContainerAppName: $(webContainerAppName)
+                apiContainerAppName: $(apiContainerAppName)
+                deploymentName: $(deploymentName)
+                imagetag: $(Build.BuildId)
+
+            - template: deploy/deploy-api-image.yaml
+              parameters:
+                environmentName: demo
+                azureContainerRegistry: $(azureContainerRegistry)
+                azureContainerRegistryImage: $(apiImageName)
+                projectName: $(projectName)
+                imagetag: $(Build.BuildId)
+                resourceGroup: 'eclipsesaas-demo-rg'
+
+            - template: deploy/deploy-web-image.yaml
+              parameters:
+                environmentName: demo
+                azureContainerRegistry: $(azureContainerRegistry)
+                azureContainerRegistryImage: $(webImageName)
+                projectName: $(projectName)
+                imagetag: $(Build.BuildId)
+                keyVaultName: kv-eclipsesaas-demo
+                resourceGroup: 'eclipsesaas-demo-rg'
+                pathpl: $(pathpl)
+
+            - template: ui-test-template.yaml
+              parameters:
+                environmentName: demo
+
+            - script: |
+                echo "One or more steps failed. Failing the pipeline."
+                exit 1
+              displayName: 'Fail pipeline if any step failed'
+              condition: eq(variables['Agent.JobStatus'], 'SucceededWithIssues')
+
+- stage: deploy_processlog_lab
+  displayName: lab - Deploy Environment
+  lockBehavior: sequential
+  dependsOn: deploy_processlog_test
+  condition: eq(variables['Build.SourceBranchName'], 'main')
+  jobs:
+    - deployment: Deploy_to_lab
+      displayName: "Deploy Process Log (lab)"
+      environment: lab
+      timeoutInMinutes: 60
+      workspace:
+        clean: all
+      strategy:
+        runOnce:
+          deploy:
+            steps:
+            
+            - checkout: self
+              fetchDepth: 0
+
+            - template: deploy/deploy-infra.yaml
+              parameters:
+                environmentName: lab
+                webContainerAppName: $(webContainerAppName)
+                apiContainerAppName: $(apiContainerAppName)
+                deploymentName: $(deploymentName)
+                imagetag: $(Build.BuildId)
+
+            - template: deploy/deploy-api-image.yaml
+              parameters:
+                environmentName: lab
+                azureContainerRegistry: $(azureContainerRegistry)
+                azureContainerRegistryImage: $(apiImageName)
+                projectName: $(projectName)
+                imagetag: $(Build.BuildId)
+                resourceGroup: 'eclipsesaas-lab-rg'
+
+            - template: deploy/deploy-web-image.yaml
+              parameters:
+                environmentName: lab
+                azureContainerRegistry: $(azureContainerRegistry)
+                azureContainerRegistryImage: $(webImageName)
+                projectName: $(projectName)
+                imagetag: $(Build.BuildId)
+                keyVaultName: kv-eclipsesaas-lab
+                resourceGroup: 'eclipsesaas-lab-rg'
+                pathpl: $(pathpl)
+
+            - script: |
+                echo "One or more steps failed. Failing the pipeline."
+                exit 1
+              displayName: 'Fail pipeline if any step failed'
+              condition: eq(variables['Agent.JobStatus'], 'SucceededWithIssues')

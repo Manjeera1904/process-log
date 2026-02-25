@@ -1,0 +1,37 @@
+parameters:
+  environmentName: ""
+  azureContainerRegistry: ""
+  azureContainerRegistryImage: ""
+  projectName: ""
+  imagetag: ''
+  resourceGroup: ""
+  sideCarImageName: ""
+  
+steps:
+  
+  - task: AzureCLI@2
+    displayName: 'Deploy api image'
+    inputs:
+      azureSubscription: 'Azure_ExlipseInsightsSaaS'
+      scriptType: 'bash'
+      scriptLocation: 'inlineScript'
+      inlineScript: |
+        az containerapp update \
+          --name 'aca-${{ parameters.azureContainerRegistryImage }}-${{ parameters.environmentName }}' \
+          --resource-group '${{ parameters.resourceGroup }}' \
+          --container-name 'aca-${{ parameters.azureContainerRegistryImage }}-${{ parameters.environmentName }}' \
+          --image '${{ parameters.azureContainerRegistry }}.azurecr.io/${{ parameters.azureContainerRegistryImage }}:${{ parameters.imagetag }}'
+
+  - ${{ if eq(parameters.environmentName, 'int') }}:
+    - task: AzureCLI@2
+      displayName: 'Deploy sidecar image (int only)'
+      inputs:
+        azureSubscription: 'Azure_ExlipseInsightsSaaS'
+        scriptType: 'bash'
+        scriptLocation: 'inlineScript'
+        inlineScript: |
+          az containerapp update \
+            --name 'aca-${{ parameters.azureContainerRegistryImage }}-${{ parameters.environmentName }}' \
+            --resource-group '${{ parameters.resourceGroup }}' \
+            --container-name 'cors-sidecar' \
+            --image '${{ parameters.azureContainerRegistry }}.azurecr.io/${{ parameters.sideCarImageName }}:${{ parameters.imagetag }}'

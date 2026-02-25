@@ -1,0 +1,95 @@
+name: 'ProcessLog - Delete Resources'
+
+trigger:
+  branches:
+    include:
+      - main
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+variables:
+  - name: resourceGroup
+    value: "eclipsesaas-int-rg"
+  - name: MyEnvironment
+    value: "cae-eclipsesaas-int"
+  - name: sqlServerName
+    value: "sseclipsesaasint"  
+
+stages:
+- stage: delete
+  displayName: Build and Deploy to PR Environment
+  condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
+  jobs:
+    - job: delete
+      displayName: "Deleting any existing resources for the PR Environment"
+      timeoutInMinutes: 60
+      workspace:
+        clean: all
+      steps:
+      - checkout: self
+        fetchDepth: 0
+        displayName: 'Checkout self branch'
+
+      - task: PowerShell@2
+        name: ExtractPRNumber
+        inputs:
+          targetType: 'inline'
+          script: |
+            $commitMessageFirstLine = git log -1 --pretty=%s
+            Write-Host "Commit message first line: $commitMessageFirstLine"
+            
+            if ($commitMessageFirstLine -match "Merged PR (\d+):") {
+                $prNumber = $matches[1]
+                Write-Host "##vso[task.setvariable variable=PR_NUMBER;isOutput=true]$prNumber"
+                Write-Host "Extracted PR Number: $prNumber"
+            }
+            else {
+                Write-Host "No PR number found in commit message (not at merge commit)"
+                Write-Host "##vso[task.setvariable variable=PR_NUMBER;isOutput=true]"
+            }
+        displayName: 'Extract PR number from merge commit'
+
+      - task: PowerShell@2
+        inputs:
+          targetType: 'inline'
+          script: |
+            $prNumber = "$(ExtractPRNumber.PR_NUMBER)"
+            if (-not [string]::IsNullOrEmpty($prNumber)) {
+                Write-Host "Setting PR_ID to: $prNumber"
+                Write-Host "##vso[task.setvariable variable=PR_ID]$prNumber"
+            } else {
+                Write-Host "PR_NUMBER is empty, using default or handling accordingly"
+                Write-Host "##vso[task.setvariable variable=PR_ID]unknown"
+            }
+        displayName: 'Set PR_ID variable'
+
+      - template: delete/delete-resources.yaml
+        parameters:
+          containerAppNamefe: 'aca-web-frontend-$(PR_ID)'
+          containerAppNamepcapi: 'aca-platform-core-api-$(PR_ID)'
+          containerAppNamepcui: 'aca-platform-core-web-$(PR_ID)'
+          containerAppNameplapi: 'aca-process-logging-api-$(PR_ID)'
+          containerAppNameplui: 'aca-process-logging-web-$(PR_ID)'
+          resourceGroup: $(resourceGroup)
+          certificateNamefe: 'cae-eclipsesaas-$(PR_ID)-aca-web-frontend-$(PR_ID)'
+          certificateNamepcapi: 'cae-eclipsesaas-$(PR_ID)-aca-platform-core-api-$(PR_ID)'
+          certificateNamepcui: 'cae-eclipsesaas-$(PR_ID)-aca-platform-core-web-$(PR_ID)'
+          certificateNameplapi: 'cae-eclipsesaas-$(PR_ID)-aca-process-logging-api-$(PR_ID)'
+          certificateNameplui: 'cae-eclipsesaas-$(PR_ID)-aca-process-logging-web-$(PR_ID)'
+          MyEnvironment: $(MyEnvironment)
+          validCertificateNamefe: 'cae-eclipsesaas-int-cert'
+          newEnvName: $(PR_ID)
+          dnsZoneName: 'eclipsevantage.com'
+          commonResourceGroup: 'eclipsesaas-common-rg'
+          sqlServerName: $(sqlServerName)
+          sqlDatabaseName: 'EIPlatformCore-$(PR_ID)'
+          sqlDatabaseNamepl: 'ProcessLog_db$(PR_ID)client'
+          dnsrecordNamefe: '$(PR_ID)'
+          dnsrecordNamepcapi: 'platform-core-api.$(PR_ID)'
+          dnsrecordNamepcui: 'platform-core-web.$(PR_ID)'
+          dnsrecordNameplapi: 'process-logging-api.$(PR_ID)'
+          dnsrecordNameplui: 'process-logging-web.$(PR_ID)'
+          appRegistrationObjectId: '12d895e7-6f29-4855-9aaf-b2db214223e6'
+          redirectUriToRemove: 'https://$(PR_ID).eclipsevantage.com/.auth/login/aad/callback'
+          serviceBusNamespace: 'asb-eclipsesaas-$(PR_ID)'

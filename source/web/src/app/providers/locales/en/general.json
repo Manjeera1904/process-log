@@ -1,0 +1,34 @@
+{
+  "appName": "Packages",
+  "selectPackage": "Select a package",
+  "Welcome to React": "Welcome to React and react-i18next",
+  "processMonitor": "Process Monitor",
+  "loadingClients": "Loading clients...",
+  "loadingProcessLogs": "Loading process logs...",
+  "errorLoadingClients": "Error loading clients: {{error}}",
+  "unnamedClient": "Unnamed Client",
+  "noStatusFound": "No Status Found",
+  "sidebar": {
+    "no_packages": "There are no packages available for the workspace.",
+    "no_workspace": "You don't have access to this workspace! Please contact Platform Admin",
+    "loading_workspace": "Loading workspace...",
+    "fetching_packages": "Fetching packages...",
+    "error_fetching_packages": "Error fetching packages...",
+    "error_fetching_workspace_name": "Error fetching workspace name...",
+    "fetching_workspace_id": "Fetching workspace ID...",
+    "error_fetching_workspace_id": "Error fetching workspace ID...",
+    "eclipse_insights": "EclipseInsights",
+    "no_package_selected": "No package selected"
+  },
+  "dataTable": {
+    "noResults": "No results."
+  },
+  "form": {
+    "back": "Back",
+    "discard": "Discard",
+    "save": "Save",
+    "done": "Done",
+    "close": "Close",
+    "delete": "Delete"
+  }
+}

@@ -1,0 +1,1250 @@
+[
+  {
+    "TestCaseName": "TC#001 - Verify that 'Process Monitor' product appears in the left-side menu and navigate to the 'Process Monitor' page",
+    "Description": "Verify that 'Process Monitoring' appears in the left-side menu",
+    "Steps": [
+      {
+        "StepName": "Open the Eclipse Vantage application",
+        "StepExpectedResult": "Application loads successfully."
+      },
+      {
+        "StepName": "Navigate to the left navigation menu and find Process Monitoring displays",
+        "StepExpectedResult": "Process Monitoring product name is displayed"
+      },
+      {
+        "StepName": "Navigate to the Process Monitoring page",
+        "StepExpectedResult": "Process Monitoring UI is displayed with expected elements."
+      }
+    ],
+    "Test Method Name": "test_verify_that_process_monitoring_appears_in_the_leftside_menu",
+    "Test Class Name": "test_processMonitoringUI",
+    "Namespace": "ui.Tests",
+    "Assembly": "vantage-platform",
+    "Test Type": "UI Test",
+    "Test Plans": [
+      {
+        "Test Plan ID": "1302",
+        "Test Suite ID": ["2622"]
+      },
+      {
+        "Test Plan ID": "1470",
+        "Test Suite ID": ["2655"]
+      }
+    ]
+  },
+  {
+    "TestCaseName": "TC#002 - Verify that 'Process Monitor' is sorted alphabetically in the menu",
+    "Description": "Verify that 'Process Monitoring' is sorted alphabetically in the menu",
+    "Steps": [
+      {
+        "StepName": "Open the Eclipse Vantage application",
+        "StepExpectedResult": "Application loads successfully."
+      },
+      {
+        "StepName": "Navigate to the menu",
+        "StepExpectedResult": "'Process Monitoring' appears in correct alphabetical order."
+      }
+    ],
+    "Test Method Name": "test_verify_that_process_monitoring_is_sorted_alphabetically_in_the_menu",
+    "Test Class Name": "",
+    "Namespace": "ui.Tests",
+    "Assembly": "vantage-platform",
+    "Test Type": "UI Test",
+    "Test Plans": [
+      {
+        "Test Plan ID": "1302",
+        "Test Suite ID": ["2622"]
+      },
+      {
+        "Test Plan ID": "1470",
+        "Test Suite ID": ["2655"]
+      }
+    ]
+  },
+  {
+    "TestCaseName": "TC#003 - Verify that the correct icon (clipboard-list from Lucide, white) is shown",
+    "Description": "Verify that the correct icon (clipboard-list from Lucide, white) is shown",
+    "Steps": [
+      {
+        "StepName": "Navigate to the left-side menu",
+        "StepExpectedResult": "Clipboard-list icon is visible next to Process Monitoring menu."
+      }
+    ],
+    "Test Method Name": "test_verify_correct_icon_clipboard_list_is_shown",
+    "Test Class Name": "test_processMonitoringUI",
+    "Namespace": "ui.Tests",
+    "Assembly": "vantage-platform",
+    "Test Type": "UI Test",
+    "Test Plans": [
+      {
+        "Test Plan ID": "1302",
+        "Test Suite ID": ["2622"]
+      },
+      {
+        "Test Plan ID": "1470",
+        "Test Suite ID": ["2655"]
+      }
+    ]
+  },
+  {
+    "TestCaseName": "TC#004 - Verify that Process ID column is visible and populated",
+    "Description": "Verify that Process ID column is visible and populated",
+    "Steps": [
+      {
+        "StepName": "Open Process Monitoring page",
+        "StepExpectedResult": "Process ID column appears in the table and has values."
+      }
+    ],
+    "Test Method Name": "test_verify_process_id_column_visible_and_populated",
+    "Test Class Name": "test_processMonitoringUI",
+    "Namespace": "ui.Tests",
+    "Assembly": "vantage-platform",
+    "Test Type": "UI Test",
+    "Test Plans": [
+      {
+        "Test Plan ID": "1302",
+        "Test Suite ID": ["2622"]
+      },
+      {
+        "Test Plan ID": "1470",
+        "Test Suite ID": ["2655"]
+      }
+    ]
+  },
+  {
+    "TestCaseName": "TC#005 - Verify Process Type shows values like Contract, 835",
+    "Description": "Verify Process Type shows values like Contract, 835",
+    "Steps": [
+      {
+        "StepName": "Inspect Process Type column",
+        "StepExpectedResult": "Process Type displays correct values like Contract, 835."
+      }
+    ],
+    "Test Method Name": "test_verify_process_type_values",
+    "Test Class Name": "test_processMonitoringUI",
+    "Namespace": "ui.Tests",
+    "Assembly": "vantage-platform",
+    "Test Type": "UI Test",
+    "Test Plans": [
+      {
+        "Test Plan ID": "1302",
+        "Test Suite ID": ["2622"]
+      },
+      {
+        "Test Plan ID": "1470",
+        "Test Suite ID": ["2655"]
+      }
+    ]
+  },
+  {
+    "TestCaseName": "TC#006 - Verify Pending state shows correct icon and color (#878B8C)",
+    "Description": "Verify Pending state shows correct icon and color (#878B8C)",
+    "Steps": [
+      {
+        "StepName": "Check a row with Pending state",
+        "StepExpectedResult": "Icon appears with color #878B8C."
+      }
+    ],
+    "Test Method Name": "test_verify_pending_state_icon_and_color",
+    "Test Class Name": "test_processMonitoringUI",
+    "Namespace": "ui.Tests",
+    "Assembly": "vantage-platform",
+    "Test Type": "UI Test",
+    "Test Plans": [
+      {
+        "Test Plan ID": "1302",
+        "Test Suite ID": ["2622"]
+      },
+      {
+        "Test Plan ID": "1470",
+        "Test Suite ID": ["2655"]
+      }
+    ]
+  },
+  {
+    "TestCaseName": "TC#007 - Verify In Progress state shows correct icon and color (#F2682A)",
+    "Description": "Verify In Progress state shows correct icon and color (#F2682A)",
+    "Steps": [
+      {
+        "StepName": "Check a row with In Progress state",
+        "StepExpectedResult": "Icon appears with color #F2682A."
+      }
+    ],
+    "Test Method Name": "test_verify_in_progress_state_icon_and_color",
+    "Test Class Name": "test_processMonitoringUI",
+    "Namespace": "ui.Tests",
+    "Assembly": "vantage-platform",
+    "Test Type": "UI Test",
+    "Test Plans": [
+      {
+        "Test Plan ID": "1302",
+        "Test Suite ID": ["2622"]
+      },
+      {
+        "Test Plan ID": "1470",
+        "Test Suite ID": ["2655"]
+      }
+    ]
+  },
+  {
+    "TestCaseName": "TC#008 - Verify Completed state shows correct icon and color (#037E28)",
+    "Description": "Verify Completed state shows correct icon and color (#037E28)",
+    "Steps": [
+      {
+        "StepName": "Check a row with Completed state",
+        "StepExpectedResult": "Icon appears with color #037E28."
+      }
+    ],
+    "Test Method Name": "test_verify_completed_state_icon_and_color",
+    "Test Class Name": "test_processMonitoringUI",
+    "Namespace": "ui.Tests",
+    "Assembly": "vantage-platform",
+    "Test Type": "UI Test",
+    "Test Plans": [
+      {
+        "Test Plan ID": "1302",
+        "Test Suite ID": ["2622"]
+      },
+      {
+        "Test Plan ID": "1470",
+        "Test Suite ID": ["2655"]
+      }
+    ]
+  },
+  {
+    "TestCaseName": "TC#009 - Verify Failed state shows correct icon and color (#AA1B04)",
+    "Description": "Verify Failed state shows correct icon and color (#AA1B04)",
+    "Steps": [
+      {
+        "StepName": "Check a row with Failed state",
+        "StepExpectedResult": "Icon appears with color #AA1B04."
+      }
+    ],
+    "Test Method Name": "test_verify_failed_state_icon_and_color",
+    "Test Class Name": "test_processMonitoringUI",
+    "Namespace": "ui.Tests",
+    "Assembly": "vantage-platform",
+    "Test Type": "UI Test",
+    "Test Plans": [
+      {
+        "Test Plan ID": "1302",
+        "Test Suite ID": ["2622"]
+      },
+      {
+        "Test Plan ID": "1470",
+        "Test Suite ID": ["2655"]
+      }
+    ]
+  },
+  {
+    "TestCaseName": "TC#010 - Verify all icons are 16px in size",
+    "Description": "Verify all icons are 16px in size",
+    "Steps": [
+      {
+        "StepName": "Inspect UI icons",
+        "StepExpectedResult": "All icons are 16x16px."
+      }
+    ],
+    "Test Method Name": "test_verify_all_icons_are_16px",
+    "Test Class Name": "test_processMonitoringUI",
+    "Namespace": "ui.Tests",
+    "Assembly": "vantage-platform",
+    "Test Type": "UI Test",
+    "Test Plans": [
+      {
+        "Test Plan ID": "1302",
+        "Test Suite ID": ["2622"]
+      },
+      {
+        "Test Plan ID": "1470",
+        "Test Suite ID": ["2655"]
+      }
+    ]
+  },
+  {
+    "TestCaseName": "TC#011 - Verify bars have correct size (3x20px) and 4px padding",
+    "Description": "Verify bars have correct size (3x20px) and 4px padding",
+    "Steps": [
+      {
+        "StepName": "Check visual styling of bars",
+        "StepExpectedResult": "Bars have size 3x20px with 4px padding."
+      }
+    ],
+    "Test Method Name": "test_verify_bar_dimensions_and_padding",
+    "Test Class Name": "test_processMonitoringUI",
+    "Namespace": "ui.Tests",
+    "Assembly": "vantage-platform",
+    "Test Type": "UI Test",
+    "Test Plans": [
+      {
+        "Test Plan ID": "1302",
+        "Test Suite ID": ["2622"]
+      },
+      {
+        "Test Plan ID": "1470",
+        "Test Suite ID": ["2655"]
+      }
+    ]
+  },
+  {
+    "TestCaseName": "TC#012 - Verify FilePresentIcon is shown with correct color (#24272A) and size (16px)",
+    "Description": "Verify FilePresentIcon is shown with correct color (#24272A) and size (16px)",
+    "Steps": [
+      {
+        "StepName": "Locate FilePresentIcon in grid",
+        "StepExpectedResult": "Icon color is #24272A and size is 16px."
+      }
+    ],
+    "Test Method Name": "test_verify_filepresenticon_color_and_size",
+    "Test Class Name": "test_processMonitoringUI",
+    "Namespace": "ui.Tests",
+    "Assembly": "vantage-platform",
+    "Test Type": "UI Test",
+    "Test Plans": [
+      {
+        "Test Plan ID": "1302",
+        "Test Suite ID": ["2622"]
+      },
+      {
+        "Test Plan ID": "1470",
+        "Test Suite ID": ["2655"]
+      }
+    ]
+  },
+  {
+    "TestCaseName": "TC#013 - Verify visual indication (e.g., red icon or message) is shown for failed processes",
+    "Description": "Verify visual indication (e.g., red icon or message) is shown for failed processes",
+    "Steps": [
+      {
+        "StepName": "Check a failed process row",
+        "StepExpectedResult": "Red icon or error message is visible."
+      }
+    ],
+    "Test Method Name": "test_verify_failed_process_visual_indication",
+    "Test Class Name": "test_processMonitoringUI",
+    "Namespace": "ui.Tests",
+    "Assembly": "vantage-platform",
+    "Test Type": "UI Test",
+    "Test Plans": [
+      {
+        "Test Plan ID": "1302",
+        "Test Suite ID": ["2622"]
+      },
+      {
+        "Test Plan ID": "1470",
+        "Test Suite ID": ["2655"]
+      }
+    ]
+  },
+  {
+    "TestCaseName": "TC#014 - Verify that each state (New, In Progress, Success, Failed) has a distinct icon and color",
+    "Description": "Verify that each state (New, In Progress, Success, Failed) has a distinct icon and color",
+    "Steps": [
+      {
+        "StepName": "Inspect various states in the grid",
+        "StepExpectedResult": "Each state has unique icon and color."
+      },
+      {
+        "StepName": "Check a process marked 'New'",
+        "StepExpectedResult": "Each state has unique icon and color."
+      }
+    ],
+    "Test Method Name": "test_verify_each_state_has_distinct_icon_and_color",
+    "Test Class Name": "test_processMonitoringUI",
+    "Namespace": "ui.Tests",
+    "Assembly": "vantage-platform",
+    "Test Type": "UI Test",
+    "Test Plans": [
+      {
+        "Test Plan ID": "1302",
+        "Test Suite ID": ["2622"]
+      },
+      {
+        "Test Plan ID": "1470",
+        "Test Suite ID": ["2655"]
+      }
+    ]
+  },
+  {
+    "TestCaseName": "TC#015 - Verify in-progress status shows animated or dynamic visual indicator",
+    "Description": "Verify in-progress status shows animated or dynamic visual indicator",
+    "Steps": [
+      {
+        "StepName": "Check a process marked 'In Progress'",
+        "StepExpectedResult": "Status icon or bar shows animation."
+      }
+    ],
+    "Test Method Name": "test_verify_in_progress_animation",
+    "Test Class Name": "test_processMonitoringUI",
+    "Namespace": "ui.Tests",
+    "Assembly": "vantage-platform",
+    "Test Type": "UI Test",
+    "Test Plans": [
+      {
+        "Test Plan ID": "1302",
+        "Test Suite ID": ["2622"]
+      },
+      {
+        "Test Plan ID": "1470",
+        "Test Suite ID": ["2655"]
+      }
+    ]
+  },
+  {
+    "TestCaseName": "TC#016 - Verify failed state has a visible error badge or red highlight",
+    "Description": "Verify failed state has a visible error badge or red highlight",
+    "Steps": [
+      {
+        "StepName": "Check failed row styling",
+        "StepExpectedResult": "Icon has red highlight or badge."
+      }
+    ],
+    "Test Method Name": "test_verify_failed_state_error_badge",
+    "Test Class Name": "test_processMonitoringUI",
+    "Namespace": "ui.Tests",
+    "Assembly": "vantage-platform",
+    "Test Type": "UI Test",
+    "Test Plans": [
+      {
+        "Test Plan ID": "1302",
+        "Test Suite ID": ["2622"]
+      },
+      {
+        "Test Plan ID": "1470",
+        "Test Suite ID": ["2655"]
+      }
+    ]
+  },
+  {
+    "TestCaseName": "TC#017 - Verify success state has a green check icon",
+    "Description": "Verify success state has a green check icon",
+    "Steps": [
+      {
+        "StepName": "Check successful process row",
+        "StepExpectedResult": "Green check icon is displayed."
+      }
+    ],
+    "Test Method Name": "test_verify_success_state_green_check_icon",
+    "Test Class Name": "test_processMonitoringUI",
+    "Namespace": "ui.Tests",
+    "Assembly": "vantage-platform",
+    "Test Type": "UI Test",
+    "Test Plans": [
+      {
+        "Test Plan ID": "1302",
+        "Test Suite ID": ["2622"]
+      },
+      {
+        "Test Plan ID": "1470",
+        "Test Suite ID": ["2655"]
+      }
+    ]
+  },
+  {
+    "TestCaseName": "TC#018 - Verify AutoAwesome icon expand field in Process Monitor",
+    "Description": "Verify that the AutoAwesome icon is displayed in the expand field of the Process Monitor row",
+    "Steps": [
+      {
+        "StepName": "Open the Eclipse Vantage application",
+        "StepExpectedResult": "Application launches successfully"
+      },
+      {
+        "StepName": "Click on Process Monitor Product",
+        "StepExpectedResult": "Process Monitor page is displayed"
+      },
+      {
+        "StepName": "Click the row on the table",
+        "StepExpectedResult": "Row expands to show details"
+      },
+      {
+        "StepName": "Verify the presence of AutoAwesome icon",
+        "StepExpectedResult": "AutoAwesome icon is displayed in the expanded row"
+      }
+    ],
+    "Test Method Name": "test_Verify_that_the_process_monitor_AutoAwesome_icon_expand_field",
+    "Test Class Name": "TestProcessMonitorHeader",
+    "Namespace": "ui.Tests",
+    "Assembly": "vantage-platform",
+    "Test Type": "UI Test",
+    "Test Plans": [
+      {
+        "Test Plan ID": "1302",
+        "Test Suite ID": ["2622"]
+      },
+      {
+        "Test Plan ID": "1470",
+        "Test Suite ID": ["2655"]
+      }
+    ]
+  },
+  {
+    "TestCaseName": "TC#019 - Verify AutoAwesome icon properties in expanded Process Monitor row",
+    "Description": "Verify that the AutoAwesome icon in the expanded row has the correct color, size, padding, and alignment",
+    "Steps": [
+      {
+        "StepName": "Redirect to Process Monitor page",
+        "StepExpectedResult": "Process Monitor page is displayed"
+      },
+      {
+        "StepName": "Check for presence of AutoAwesome icon",
+        "StepExpectedResult": "AutoAwesome icon is displayed within the expanded row"
+      },
+      {
+        "StepName": "Verify the icon properties",
+        "StepExpectedResult": "Icon matches the following properties: 20px size, color #CF4520 (Persimmon Medium), padding 8px left/right and 3px top/bottom, aligned left and bottom"
+      }
+    ],
+    "Test Method Name": "test_verify_autoawesome_icon_and_expanded_properties",
+    "Test Class Name": "TestProcessMonitorHeader",
+    "Namespace": "ui.Tests",
+    "Assembly": "vantage-platform",
+    "Test Type": "UI Test",
+    "Test Plans": [
+      {
+        "Test Plan ID": "1302",
+        "Test Suite ID": ["2622"]
+      },
+      {
+        "Test Plan ID": "1470",
+        "Test Suite ID": ["2655"]
+      }
+    ]
+  },
+  {
+    "TestCaseName": "TC#020 - Verify Process Monitor product search field functionality",
+    "Description": "Ensure that the search field in Process Monitor filters rows correctly when searching for 'Automatic'",
+    "Steps": [
+      {
+        "StepName": "Navigate to Process Monitor page",
+        "StepExpectedResult": "Process Monitor page is displayed"
+      },
+      {
+        "StepName": "Verify the search field functionality",
+        "StepExpectedResult": "When searching for 'Automatic', rows are displayed and each result contains the text 'Automatic'"
+      }
+    ],
+    "Test Method Name": "test_Verify_that_the_process_monitor_product_search_field",
+    "Test Class Name": "TestProcessMonitorTable",
+    "Namespace": "ui.Tests",
+    "Assembly": "vantage-platform",
+    "Test Type": "UI Test",
+    "Test Plans": [
+      {
+        "Test Plan ID": "1302",
+        "Test Suite ID": ["2622"]
+      },
+      {
+        "Test Plan ID": "1470",
+        "Test Suite ID": ["2655"]
+      }
+    ]
+  },
+  {
+    "TestCaseName": "TC#021 - Verify scrolling loads all rows in Process Monitor",
+    "Description": "Ensure that scrolling the table in Process Monitor loads all rows correctly",
+    "Steps": [
+      {
+        "StepName": "Navigate to Process Monitor page",
+        "StepExpectedResult": "Process Monitor page is displayed successfully"
+      },
+      {
+        "StepName": "Scroll through the table to load all rows",
+        "StepExpectedResult": "All rows are loaded as the user scrolls to the bottom of the table"
+      }
+    ],
+    "Test Method Name": "scroll_to_load_all_rows",
+    "Test Class Name": "TestProcessMonitorPagination",
+    "Namespace": "ui.Tests",
+    "Assembly": "vantage-platform",
+    "Test Type": "UI Test",
+    "Test Plans": [
+      {
+        "Test Plan ID": "1302",
+        "Test Suite ID": ["2622"]
+      },
+      {
+        "Test Plan ID": "1470",
+        "Test Suite ID": ["2655"]
+      }
+    ]
+  },
+  {
+    "TestCaseName": "TC#022 - Verify waiting for minimum rows to load in Process Monitor",
+    "Description": "Ensure that the table in Process Monitor waits until the expected minimum number of rows are loaded",
+    "Steps": [
+      {
+        "StepName": "Navigate to Process Monitor page",
+        "StepExpectedResult": "Process Monitor page is displayed successfully"
+      },
+      {
+        "StepName": "Wait for the table rows to load",
+        "StepExpectedResult": "The table waits until at least the expected minimum number of rows are loaded within the timeout"
+      }
+    ],
+    "Test Method Name": "wait_for_rows_to_load",
+    "Test Class Name": "TestProcessMonitorPagination",
+    "Namespace": "ui.Tests",
+    "Assembly": "vantage-platform",
+    "Test Type": "UI Test",
+    "Test Plans": [
+      {
+        "Test Plan ID": "1302",
+        "Test Suite ID": ["2622"]
+      },
+      {
+        "Test Plan ID": "1470",
+        "Test Suite ID": ["2655"]
+      }
+    ]
+  },
+  {
+    "TestCaseName": "TC#023 - Verify all headers are present in Process Monitor table",
+    "Description": "Ensure that all expected headers are displayed in the Process Monitor table",
+    "Steps": [
+      {
+        "StepName": "Redirect to Process Monitor page",
+        "StepExpectedResult": "Process Monitor page is displayed"
+      },
+      {
+        "StepName": "Verify all headers are present in the table",
+        "StepExpectedResult": "'Type', 'Id', 'Description', 'Client', 'Source', 'Processed On', 'Duration', 'State', and 'Disposition' headers are displayed in the table"
+      }
+    ],
+    "Test Method Name": "test_verify_that_the_process_monitor_headers",
+    "Test Class Name": "TestProcessMonitorHeader",
+    "Namespace": "ui.Tests",
+    "Assembly": "vantage-platform",
+    "Test Type": "UI Test",
+    "Test Plans": [
+      {
+        "Test Plan ID": "1302",
+        "Test Suite ID": ["2622"]
+      },
+      {
+        "Test Plan ID": "1470",
+        "Test Suite ID": ["2655"]
+      }
+    ]
+  },
+  {
+    "TestCaseName": "TC#024 - Verify filtering by client in Process Monitor",
+    "Description": "Verify that the Process Monitor correctly filters the table based on the selected client (e.g., 'processdb').",
+    "Steps": [
+      {
+        "StepName": "Open the Eclipse Vantage application",
+        "StepExpectedResult": "Application launches successfully"
+      },
+      {
+        "StepName": "Click on Process Monitor Product",
+        "StepExpectedResult": "Process Monitor page is displayed"
+      },
+      {
+        "StepName": "Wait for the 'Loading process logs...' text to disappear",
+        "StepExpectedResult": "'Loading process logs...' is no longer visible, and the page is ready for interaction"
+      },
+      {
+        "StepName": "Click on the 'Client' filter dropdown",
+        "StepExpectedResult": "Client filter options are displayed"
+      },
+      {
+        "StepName": "Select 'processdb' from the client filter options",
+        "StepExpectedResult": "Table reloads and displays only rows with 'processdb' in the Client column"
+      },
+      {
+        "StepName": "Verify all displayed rows have 'processdb' as the client",
+        "StepExpectedResult": "Each row in the 'Client' column contains the value 'processdb'"
+      }
+    ],
+    "Test Method Name": "test_filter_by_client",
+    "Test Class Name": "TestProcessMonitorFilter",
+    "Namespace": "ui.Tests",
+    "Assembly": "vantage-platform",
+    "Test Type": "UI Test",
+    "Test Plans": [
+      {
+        "Test Plan ID": "1302",
+        "Test Suite ID": ["2622"]
+      },
+      {
+        "Test Plan ID": "1470",
+        "Test Suite ID": ["2655"]
+      }
+    ]
+  },
+  {
+    "TestCaseName": "TC#025 - Verify filtering by date range in Process Monitor",
+    "Description": "Verify that the Process Monitor correctly filters records based on selected date ranges like Today, Last 7 Days, Last 14 Days, and Last 30 Days.",
+    "Steps": [
+      {
+        "StepName": "Open the Eclipse Vantage application",
+        "StepExpectedResult": "Application launches successfully"
+      },
+      {
+        "StepName": "Click on Process Monitor Product",
+        "StepExpectedResult": "Process Monitor page is displayed"
+      },
+      {
+        "StepName": "Wait for the 'Loading process logs...' message to disappear",
+        "StepExpectedResult": "Loading message disappears, and the table becomes interactive"
+      },
+      {
+        "StepName": "Click on the 'Client' filter and select 'processdb'",
+        "StepExpectedResult": "Table reloads and displays rows with client 'processdb'"
+      },
+      {
+        "StepName": "Click on the 'Date' filter",
+        "StepExpectedResult": "Date filter options are displayed"
+      },
+      {
+        "StepName": "Iterate through date options: Today, Last 7 Days, Last 14 Days, Last 30 Days",
+        "StepExpectedResult": "Table displays only the rows that match the selected date range"
+      },
+      {
+        "StepName": "Verify each row has a valid 'Processed On' date for the selected range",
+        "StepExpectedResult": "Each row in the 'Processed On' column is populated and not empty"
+      }
+    ],
+    "Test Method Name": "test_filter_by_days",
+    "Test Class Name": "TestProcessMonitorFilter",
+    "Namespace": "ui.Tests",
+    "Assembly": "vantage-platform",
+    "Test Type": "UI Test",
+    "Test Plans": [
+      {
+        "Test Plan ID": "1302",
+        "Test Suite ID": ["2622"]
+      },
+      {
+        "Test Plan ID": "1470",
+        "Test Suite ID": ["2655"]
+      }
+    ]
+  },
+
+  {
+    "TestCaseName": "TC#026 - Filter by a single status in Process Monitor UI",
+    "Description": "Verify that filtering by a single status in the Process Monitor UI correctly filters the displayed rows.",
+    "Steps": [
+      {
+        "StepName": "Fetch all statuses from /api/ProcessStatus",
+        "StepExpectedResult": "List of statuses is retrieved"
+      },
+      {
+        "StepName": "Open Eclipse Vantage and navigate to Process Monitor",
+        "StepExpectedResult": "Process Monitor page is displayed"
+      },
+      {
+        "StepName": "Apply filters: client='processdb', date='Last30Days', status=selected status",
+        "StepExpectedResult": "Table updates and shows rows with selected status"
+      },
+      {
+        "StepName": "Verify that all rows in the status column match selected status",
+        "StepExpectedResult": "Each row's status matches the applied filter"
+      }
+    ],
+    "Test Method Name": "test_filter_by_status",
+    "Test Class Name": "TestProcessMonitorFilter",
+    "Namespace": "ui.Tests",
+    "Assembly": "vantage-platform",
+    "Test Type": "UI Test",
+    "Test Plans": [
+      {
+        "Test Plan ID": "1302",
+        "Test Suite ID": ["2622"]
+      },
+      {
+        "Test Plan ID": "1470",
+        "Test Suite ID": ["2655"]
+      }
+    ]
+  },
+  {
+    "TestCaseName": "TC#027 - Filter by multiple statuses in Process Monitor UI",
+    "Description": "Verify that selecting multiple statuses in the filter displays only matching entries in the table.",
+    "Steps": [
+      {
+        "StepName": "Fetch the first two available statuses from /api/ProcessStatus",
+        "StepExpectedResult": "At least two valid statuses are retrieved"
+      },
+      {
+        "StepName": "Open Eclipse Vantage and navigate to Process Monitor",
+        "StepExpectedResult": "Process Monitor page is displayed"
+      },
+      {
+        "StepName": "Apply filters: client='processdb', date='Last30Days', status=[status1, status2]",
+        "StepExpectedResult": "Table updates and shows rows matching any of the selected statuses"
+      },
+      {
+        "StepName": "Verify bottom-alignment of status icon in row (UI validation)",
+        "StepExpectedResult": "Icon is correctly aligned based on layout expectations"
+      }
+    ],
+    "Test Method Name": "test_filter_by_two_statuses",
+    "Test Class Name": "TestProcessMonitorFilter",
+    "Namespace": "ui.Tests",
+    "Assembly": "vantage-platform",
+    "Test Type": "UI Test",
+    "Test Plans": [
+      {
+        "Test Plan ID": "1302",
+        "Test Suite ID": ["2622"]
+      },
+      {
+        "Test Plan ID": "1470",
+        "Test Suite ID": ["2655"]
+      }
+    ]
+  },
+  {
+    "TestCaseName": "TC#028 - Compare UI row count with API data for filtered status",
+    "Description": "Ensure that the number of rows shown in the UI after applying a status filter matches the count from the API.",
+    "Steps": [
+      {
+        "StepName": "Fetch all statuses from /api/ProcessStatus and select one",
+        "StepExpectedResult": "A valid status is selected for testing"
+      },
+      {
+        "StepName": "Apply filters: client='processdb', date='Last30Days', and selected status",
+        "StepExpectedResult": "Table updates and shows rows with selected status"
+      },
+      {
+        "StepName": "Count number of matching rows in UI",
+        "StepExpectedResult": "UI shows correct number of filtered rows"
+      },
+      {
+        "StepName": "Make GET call to /api/Processes and count rows with same status",
+        "StepExpectedResult": "Number of filtered items from API is retrieved"
+      },
+      {
+        "StepName": "Compare UI row count with filtered API result count",
+        "StepExpectedResult": "UI and API counts match for the selected status"
+      }
+    ],
+    "Test Method Name": "test_filter_status_and_compare_UIcount_with_APIcount",
+    "Test Class Name": "TestProcessMonitorFilter",
+    "Namespace": "ui.Tests",
+    "Assembly": "vantage-platform",
+    "Test Type": "UI + API Comparison Test",
+    "Test Plans": [
+      {
+        "Test Plan ID": "1302",
+        "Test Suite ID": ["2622"]
+      },
+      {
+        "Test Plan ID": "1470",
+        "Test Suite ID": ["2655"]
+      }
+    ]
+  },
+  {
+    "TestCaseName": "TC#029 - Error message for unconfigured database in Process Monitor UI",
+    "Description": "Verify that the appropriate error message is shown when Process Monitor is accessed for a client without a configured database.",
+    "Steps": [
+      {
+        "StepName": "Open Eclipse Vantage and navigate to Process Monitor with an unconfigured client",
+        "StepExpectedResult": "Process Monitor page attempts to load"
+      },
+      {
+        "StepName": "Wait for error message to appear",
+        "StepExpectedResult": "System waits for the error message to load within a reasonable timeout"
+      },
+      {
+        "StepName": "Verify presence of error message: 'There is no configured database for this client.'",
+        "StepExpectedResult": "Error message is visible and matches the expected text"
+      }
+    ],
+    "Test Method Name": "test_error_message_for_unconfigured_database",
+    "Test Class Name": "TestProcessMonitorFilter",
+    "Namespace": "ui.Tests",
+    "Assembly": "vantage-platform",
+    "Test Type": "UI Test",
+    "Test Plans": [
+      {
+        "Test Plan ID": "1302",
+        "Test Suite ID": ["2622"]
+      },
+      {
+        "Test Plan ID": "1470",
+        "Test Suite ID": ["2655"]
+      }
+    ]
+  },
+  {
+    "TestCaseName": "TC#030 - Process Monitor page remains visible after tab switch for ReviewClient",
+    "Description": "Verify that the Process Monitor page stays responsive and does not go blank after switching to another browser tab and returning.",
+    "Steps": [
+      {
+        "StepName": "Open Eclipse Vantage and navigate to Process Monitor",
+        "StepExpectedResult": "Process Monitor page is displayed"
+      },
+      {
+        "StepName": "Apply filters: client='processdb', date='Last30Days'",
+        "StepExpectedResult": "Filters are applied and data is displayed"
+      },
+      {
+        "StepName": "Open a new browser tab and navigate to an external site",
+        "StepExpectedResult": "New tab opens and loads the external site"
+      },
+      {
+        "StepName": "Wait for 2 minutes in the new tab",
+        "StepExpectedResult": "Simulates user inactivity on the original tab"
+      },
+      {
+        "StepName": "Switch back to the original Process Monitor tab",
+        "StepExpectedResult": "Original tab is restored in focus"
+      },
+      {
+        "StepName": "Interact with the Process Monitor page to verify responsiveness",
+        "StepExpectedResult": "Page remains interactive and responsive without any display issues"
+      }
+    ],
+    "Test Method Name": "test_process_monitor_page_remains_visible_after_tab_switch_for_reviewclient",
+    "Test Class Name": "TestProcessMonitorFilter",
+    "Namespace": "ui.Tests",
+    "Assembly": "vantage-platform",
+    "Test Type": "UI Stability Test",
+    "Test Plans": [
+      {
+        "Test Plan ID": "1302",
+        "Test Suite ID": ["2622"]
+      },
+      {
+        "Test Plan ID": "1470",
+        "Test Suite ID": ["2655"]
+      }
+    ]
+  },
+  {
+    "TestCaseName": "TC#031 - Process Monitor page remains visible after tab switch for UnconfiguredClient",
+    "Description": "Verify that the Process Monitor page remains responsive and does not go blank after switching tabs, even when the client has no configured database.",
+    "Steps": [
+      {
+        "StepName": "Open Eclipse Vantage and navigate to Process Monitor with an unconfigured client",
+        "StepExpectedResult": "Process Monitor page displays error or default view due to missing database config"
+      },
+      {
+        "StepName": "Open a new browser tab and navigate to an external site",
+        "StepExpectedResult": "New tab opens and loads the external site"
+      },
+      {
+        "StepName": "Wait for 2 minutes in the new tab",
+        "StepExpectedResult": "Simulates user inactivity on the original tab"
+      },
+      {
+        "StepName": "Switch back to the original Process Monitor tab",
+        "StepExpectedResult": "Original tab is restored in focus"
+      },
+      {
+        "StepName": "Interact with the Process Monitor page to verify responsiveness",
+        "StepExpectedResult": "Page remains interactive and responsive without going blank"
+      }
+    ],
+    "Test Method Name": "test_process_monitor_page_remains_visible_after_tab_switch_for_unconfiguredclient",
+    "Test Class Name": "TestProcessMonitorFilter",
+    "Namespace": "ui.Tests",
+    "Assembly": "vantage-platform",
+    "Test Type": "UI Stability Test",
+    "Test Plans": [
+      {
+        "Test Plan ID": "1302",
+        "Test Suite ID": ["2622"]
+      },
+      {
+        "Test Plan ID": "1470",
+        "Test Suite ID": ["2655"]
+      }
+    ]
+  },
+  {
+    "TestCaseName": "TC#032 - Verify tooltips for 'Type' and 'Source' columns in Process Monitor UI",
+    "Description": "Ensure that hovering over the 'Type' and 'Source' cells in the Process Monitor table displays the correct tooltips.",
+    "Steps": [
+      {
+        "StepName": "Open Eclipse Vantage and navigate to Process Monitor",
+        "StepExpectedResult": "Process Monitor page is displayed"
+      },
+      {
+        "StepName": "Apply filters: client='processdb', date='Last30Days'",
+        "StepExpectedResult": "Filtered data is loaded and displayed in the table"
+      },
+      {
+        "StepName": "Hover over 'Type' column in the first row",
+        "StepExpectedResult": "Tooltip appears with the correct 'Type' description"
+      },
+      {
+        "StepName": "Hover over 'Source' column in the first row",
+        "StepExpectedResult": "Tooltip appears with the correct 'Source' description"
+      }
+    ],
+    "Test Method Name": "test_Verify_tooltips_for_type_and_source_columns",
+    "Test Class Name": "TestProcessMonitorTooltips",
+    "Namespace": "ui.Tests",
+    "Assembly": "vantage-platform",
+    "Test Type": "UI Tooltip Validation Test",
+    "Test Plans": [
+      {
+        "Test Plan ID": "1302",
+        "Test Suite ID": ["2622"]
+      },
+      {
+        "Test Plan ID": "1470",
+        "Test Suite ID": ["2655"]
+      }
+    ]
+  },
+  {
+    "TestCaseName": "TC#033 - Add New Client in Process Monitor",
+    "Description": "Verify that a new client can be added successfully with all required configurations in Process Monitor.",
+    "Steps": [
+      {
+        "StepName": "Open Eclipse Analytics URL",
+        "StepExpectedResult": "Eclipse Analytics page is loaded"
+      },
+      {
+        "StepName": "Navigate to Client Configuration via Settings Gear Icon",
+        "StepExpectedResult": "Client Configuration page is displayed"
+      },
+      {
+        "StepName": "Click 'Add New Client' button",
+        "StepExpectedResult": "New Client form is displayed"
+      },
+      {
+        "StepName": "Enter generated client name and description",
+        "StepExpectedResult": "Client name and description fields are populated"
+      },
+      {
+        "StepName": "Click Create button",
+        "StepExpectedResult": "Client creation process is initiated"
+      },
+      {
+        "StepName": "Select tenants and add required products (Eclipse Dev Tenant, Eclipse Analytics, Platform Administration, Process Monitoring)",
+        "StepExpectedResult": "Tenants and products are selected correctly"
+      },
+      {
+        "StepName": "Click Save button",
+        "StepExpectedResult": "Client configuration is saved successfully"
+      }
+    ],
+    "Test Method Name": "test_Add_New_Client",
+    "Test Class Name": "TestProcessMonitor",
+    "Namespace": "ui.Tests",
+    "Assembly": "vantage-platform",
+    "Test Type": "UI Functional Test",
+    "Test Plans": [
+      {
+        "Test Plan ID": "1303",
+        "Test Suite ID": ["2623"]
+      }
+    ]
+  },
+  {
+    "TestCaseName": "TC#034 - Add Created Client to Test User with Multiple Roles",
+    "Description": "Verify that the created client can be added as active to the test user with multiple roles assigned.",
+    "Steps": [
+      {
+        "StepName": "Open home URL",
+        "StepExpectedResult": "Home page is loaded"
+      },
+      {
+        "StepName": "Navigate to User Section via Settings Gear Icon",
+        "StepExpectedResult": "User Section page is displayed"
+      },
+      {
+        "StepName": "Search for Test User by email 'TestAutomation02@EclipseDevelopmentTest.onmicrosoft.com'",
+        "StepExpectedResult": "Test User profile is displayed"
+      },
+      {
+        "StepName": "Click Edit on the Test User profile",
+        "StepExpectedResult": "Edit User page is displayed"
+      },
+      {
+        "StepName": "Select Eclipse Dev Tenant and add another client",
+        "StepExpectedResult": "Tenant selected and new client add option available"
+      },
+      {
+        "StepName": "Select latest client dropdown and choose the created client",
+        "StepExpectedResult": "Created client is selected"
+      },
+      {
+        "StepName": "Add multiple roles (Process Log, File Manager, Administrator) for the selected client",
+        "StepExpectedResult": "Roles are assigned successfully"
+      },
+      {
+        "StepName": "Save the changes",
+        "StepExpectedResult": "User client and roles are saved correctly"
+      }
+    ],
+    "Test Method Name": "test_For_Test_User_adding_Created_Client_as_active",
+    "Test Class Name": "TestProcessMonitor",
+    "Namespace": "ui.Tests",
+    "Assembly": "vantage-platform",
+    "Test Type": "UI Functional Test",
+    "Test Plans": [
+      {
+        "Test Plan ID": "1304",
+        "Test Suite ID": ["2624"]
+      }
+    ]
+  },
+  {
+    "TestCaseName": "TC#035 - Add 'review' Client to Test User with Multiple Roles",
+    "Description": "Verify that the 'review' client can be added as active to the test user with multiple roles assigned.",
+    "Steps": [
+      {
+        "StepName": "Open home URL",
+        "StepExpectedResult": "Home page is loaded"
+      },
+      {
+        "StepName": "Navigate to User Section via Settings Gear Icon",
+        "StepExpectedResult": "User Section page is displayed"
+      },
+      {
+        "StepName": "Search for Test User by email 'TestAutomation02@EclipseDevelopmentTest.onmicrosoft.com'",
+        "StepExpectedResult": "Test User profile is displayed"
+      },
+      {
+        "StepName": "Click Edit on the Test User profile",
+        "StepExpectedResult": "Edit User page is displayed"
+      },
+      {
+        "StepName": "Add another client and select 'review' client",
+        "StepExpectedResult": "'review' client is selected"
+      },
+      {
+        "StepName": "Add multiple roles (Process Log, File Manager, Administrator) for 'review' client",
+        "StepExpectedResult": "Roles are assigned successfully"
+      },
+      {
+        "StepName": "Save the changes",
+        "StepExpectedResult": "User client and roles are saved correctly"
+      }
+    ],
+    "Test Method Name": "test_For_Test_User_adding_review_Client_as_active",
+    "Test Class Name": "TestProcessDbDefaultClient",
+    "Namespace": "ui.Tests",
+    "Assembly": "vantage-platform",
+    "Test Type": "UI Functional Test",
+    "Test Plans": [
+      {
+        "Test Plan ID": "1305",
+        "Test Suite ID": ["2625"]
+      }
+    ]
+  },
+  {
+    "TestCaseName": "TC#036 - Verify Process Monitor Product Presence in Settings Menu",
+    "Description": "Ensure the Process Monitor product is displayed in the settings menu.",
+    "Steps": [
+      {
+        "StepName": "Click on the Settings Gear Icon",
+        "StepExpectedResult": "Settings menu is opened"
+      },
+      {
+        "StepName": "Verify Process Monitor product is listed",
+        "StepExpectedResult": "Process Monitor product is visible"
+      }
+    ],
+    "Test Method Name": "test_Verify_that_the_process_monitor_product_displays_in_the_menu",
+    "Test Class Name": "TestProcessMonitorTable",
+    "Namespace": "ui.Tests",
+    "Assembly": "vantage-platform",
+    "Test Type": "UI Validation Test",
+    "Test Plans": [
+      {
+        "Test Plan ID": "1306",
+        "Test Suite ID": ["2626"]
+      }
+    ]
+  },
+  {
+    "TestCaseName": "TC#037 - Validate Column Headers in Process Monitor Table",
+    "Description": "Verify that all expected column headers are present in the Process Monitor table after applying filters.",
+    "Steps": [
+      {
+        "StepName": "Navigate to Process Monitor product in settings",
+        "StepExpectedResult": "Process Monitor page is displayed"
+      },
+      {
+        "StepName": "Apply filters: client='processdb', date='Last30Days'",
+        "StepExpectedResult": "Filtered data is loaded"
+      },
+      {
+        "StepName": "Verify table column headers",
+        "StepExpectedResult": "Headers include Type, Id, Description, Client, Source, Processed On, Duration, State, Disposition"
+      }
+    ],
+    "Test Method Name": "test_validate_column_headers",
+    "Test Class Name": "TestProcessMonitorTable",
+    "Namespace": "ui.Tests",
+    "Assembly": "vantage-platform",
+    "Test Type": "UI Table Validation Test",
+    "Test Plans": [
+      {
+        "Test Plan ID": "1307",
+        "Test Suite ID": ["2627"]
+      }
+    ]
+  },
+  {
+    "TestCaseName": "TC#038 - Validate 'State' Column Values in Process Monitor Table Rows",
+    "Description": "Verify each row's 'State' column contains valid values as per API response.",
+    "Steps": [
+      {
+        "StepName": "Navigate to Process Monitor product",
+        "StepExpectedResult": "Process Monitor page is displayed"
+      },
+      {
+        "StepName": "Apply filters: client='processdb', date='Last30Days'",
+        "StepExpectedResult": "Filtered data is loaded"
+      },
+      {
+        "StepName": "Fetch valid 'State' values from API",
+        "StepExpectedResult": "Valid state names list is retrieved"
+      },
+      {
+        "StepName": "Verify each table row's 'State' value matches valid API names",
+        "StepExpectedResult": "All 'State' values in rows are valid"
+      }
+    ],
+    "Test Method Name": "test_validate_table_rows_data",
+    "Test Class Name": "TestProcessMonitorTable",
+    "Namespace": "ui.Tests",
+    "Assembly": "vantage-platform",
+    "Test Type": "UI Data Validation Test",
+    "Test Plans": [
+      {
+        "Test Plan ID": "1308",
+        "Test Suite ID": ["2628"]
+      }
+    ]
+  },
+  {
+    "TestCaseName": "TC#039 - Validate 'Type' Column Values in Process Monitor Table Rows",
+    "Description": "Verify each row's 'Type' column contains valid values ('Payor Contract Analysis', 'Receive File').",
+    "Steps": [
+      {
+        "StepName": "Navigate to Process Monitor product",
+        "StepExpectedResult": "Process Monitor page is displayed"
+      },
+      {
+        "StepName": "Apply filters: client='processdb', date='Last30Days'",
+        "StepExpectedResult": "Filtered data is loaded"
+      },
+      {
+        "StepName": "Verify each table row's 'Type' value is among valid types",
+        "StepExpectedResult": "All 'Type' values in rows are valid"
+      }
+    ],
+    "Test Method Name": "test_validate_table_rows_data2",
+    "Test Class Name": "TestProcessMonitorTable",
+    "Namespace": "ui.Tests",
+    "Assembly": "vantage-platform",
+    "Test Type": "UI Data Validation Test",
+    "Test Plans": [
+      {
+        "Test Plan ID": "1309",
+        "Test Suite ID": ["2629"]
+      }
+    ]
+  }
+]

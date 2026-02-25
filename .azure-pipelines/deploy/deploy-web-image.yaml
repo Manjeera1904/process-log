@@ -1,0 +1,148 @@
+parameters:
+  environmentName: ""
+  azureContainerRegistry: ""
+  azureContainerRegistryImage: ""
+  projectName: ""
+  imagetag: ''
+  keyVaultName: ''
+  resourceGroup: ""
+  npmrcPath: '.npmrc'
+  pathpl: ''
+  sideCarImageName: ""
+
+steps:
+
+  - task: AzureCLI@2
+    displayName: 'Deploy web image'
+    inputs:
+      azureSubscription: 'Azure_ExlipseInsightsSaaS'
+      scriptType: 'bash'
+      scriptLocation: 'inlineScript'
+      inlineScript: |
+        az containerapp update \
+          --name 'aca-${{ parameters.azureContainerRegistryImage }}-${{ parameters.environmentName }}' \
+          --resource-group '${{ parameters.resourceGroup }}' \
+          --container-name 'aca-${{ parameters.azureContainerRegistryImage }}-${{ parameters.environmentName }}' \
+          --image '${{ parameters.azureContainerRegistry }}.azurecr.io/${{ parameters.azureContainerRegistryImage }}:${{ parameters.imagetag }}'
+
+  - ${{ if eq(parameters.environmentName, 'int') }}:
+    - task: AzureCLI@2
+      displayName: 'Deploy sidecar image (int only)'
+      inputs:
+        azureSubscription: 'Azure_ExlipseInsightsSaaS'
+        scriptType: 'bash'
+        scriptLocation: 'inlineScript'
+        inlineScript: |
+          az containerapp update \
+            --name 'aca-${{ parameters.azureContainerRegistryImage }}-${{ parameters.environmentName }}' \
+            --resource-group '${{ parameters.resourceGroup }}' \
+            --container-name 'cors-sidecar' \
+            --image '${{ parameters.azureContainerRegistry }}.azurecr.io/${{ parameters.sideCarImageName }}:${{ parameters.imagetag }}'
+
+  - script: echo 'registry=https://pkgs.dev.azure.com/EclipseInsightsHC/Commercialization/_packaging/eclipse-insights-nuget/npm/registry/' > ${{ parameters.npmrcPath }}
+    displayName: 'Creating NPMRC'
+
+  - script: echo 'always-auth=true' >> ${{ parameters.npmrcPath }}
+    displayName: 'Changing to NPMRC folder'
+
+  - task: npmAuthenticate@0
+    inputs:
+      workingFile: ${{ parameters.npmrcPath }}
+
+  - script: |
+      cp ${{ parameters.pathpl}}/.npmrc ${{ parameters.pathpl}}/source/web/.npmrc
+    displayName: 'Copy .npmrc to source/web'
+
+  - script: |
+      npm install -g pnpm@10.28.1 --registry=https://registry.npmjs.org/
+
+      cd '${{ parameters.pathpl}}/source/web'
+      pnpm install
+      pnpm install -D ts-morph
+      pnpm install -D @types/node
+      echo "Running generate:docs"
+      pnpm generate:docs
+    displayName: 'Generate Documentation'
+    env:
+      NODE_ENV: development
+      NPM_CONFIG_USERCONFIG: ${{ parameters.pathpl}}/source/web/.npmrc
+  
+  - task: AzureKeyVault@2
+    inputs:
+      azureSubscription: 'Azure_ExlipseInsightsSaaS'
+      KeyVaultName: ${{ parameters.keyVaultName }}
+      SecretsFilter: 'aca-process-logging-web-fdqn,aca-process-logging-api-fdqn'
+      RunAsPreJob: false
+
+  - script: |
+      node -e "
+      const fs = require('fs');
+      const endpointFqdn = process.env.ENDPOINT_URI;
+      const endpoint = {
+        applicationId: '983aad26-36bb-4726-8e4b-d71f86608b2e',
+        endpointType: 'RemoteEntry',
+        endpointKey: 'remoteentry',
+        endpointUri: 'https://' + endpointFqdn + '/remoteEntry.js'
+      };
+      const components = JSON.parse(fs.readFileSync('${{ parameters.pathpl}}/source/web/public/components.json', 'utf8'));
+      const updated = components.map(c => {
+        const { componentName, ...rest } = c;
+        return { componentName, ComponentKey: componentName, ...rest };
+      });
+      const output = { endpoint, components: updated };
+      fs.writeFileSync('component-registration.json', JSON.stringify(output, null, 2));
+      console.log(JSON.stringify(output, null, 2));
+      "
+    displayName: "Generate endpoint + components.json with ComponentKey (ordered)"
+    env:
+      ENDPOINT_URI: $(aca-process-logging-web-fdqn)
+
+  - script: |
+      npm install -g ajv-cli
+      ajv validate \
+        -s ${{ parameters.pathpl}}/./source/web/public/assets/schemas/componentregistration.schema.json \
+        -d ./component-registration.json --strict=false --spec=draft7
+    displayName: "WEB Validate component-registration.json against schema"
+
+  - script: |
+      curl -X POST "https://platform-core-api.${{ parameters.environmentName }}.eclipsevantage.com/api/ComponentRegistration?api-version=1.0" \
+        -H "Content-Type: application/json" \
+        --data-binary @component-registration.json
+    displayName: 'POST component registration to remoteEntry'
+
+  - script: |
+      node -e "
+      const fs = require('fs');
+      const endpointFqdn = process.env.ENDPOINT_URI;
+      const endpoint = {
+        applicationId: '983aad26-36bb-4726-8e4b-d71f86608b2e',
+        endpointType: 'API',
+        endpointKey: 'API',
+        endpointUri: 'https://' + endpointFqdn
+      };
+      const components = JSON.parse(fs.readFileSync('${{ parameters.pathpl}}/source/web/public/components.json', 'utf8'));
+      const updated = components.map(c => {
+        const { componentName, ...rest } = c;
+        return { componentName, ComponentKey: componentName, ...rest };
+      });
+      const output = { endpoint, components: updated };
+      fs.writeFileSync('component-registrationapi.json', JSON.stringify(output, null, 2));
+      console.log(JSON.stringify(output, null, 2));
+      "
+    displayName: "Generate endpoint + components.json with ComponentKey (ordered)"
+    env:
+      ENDPOINT_URI: $(aca-process-logging-api-fdqn)
+
+  - script: |
+      npm install -g ajv-cli
+      ajv validate \
+        -s ${{ parameters.pathpl}}/./source/web/public/assets/schemas/componentregistration.schema.json \
+        -d ./component-registrationapi.json --strict=false --spec=draft7
+    displayName: "API Validate component-registrationapi.json against schema"
+
+  - script: |
+      curl -X POST "https://platform-core-api.${{ parameters.environmentName }}.eclipsevantage.com/api/ComponentRegistration?api-version=1.0" \
+        -H "Content-Type: application/json" \
+        --data-binary @component-registrationapi.json
+    displayName: "POST component registration to API"
+    

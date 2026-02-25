@@ -1,0 +1,6 @@
+# ./husky/pre-commit
+
+# Check if there are any changes in the source/web directory
+if git diff --cached --name-only | grep -q '^source/web/'; then
+  cd source/web && pnpm lint
+fi

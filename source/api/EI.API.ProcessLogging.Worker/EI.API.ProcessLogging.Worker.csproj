@@ -1,0 +1,45 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\EI.API.ProcessLogging.Data\EI.API.ProcessLogging.Data.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Asp.Versioning.Mvc.ApiExplorer" Version="8.1.0" />
+    <PackageReference Include="Autofac" Version="8.1.1" />
+    <PackageReference Include="Autofac.Extensions.DependencyInjection" Version="10.0.0" />
+    <PackageReference Include="Autofac.Extras.AggregateService" Version="6.1.2" />
+    <PackageReference Include="AutoMapper" Version="13.0.1" />
+    <PackageReference Include="Azure.Monitor.OpenTelemetry.AspNetCore" Version="1.2.0" />
+    <PackageReference Include="Azure.Monitor.OpenTelemetry.Exporter" Version="1.3.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.0" />
+    <PackageReference Include="HotChocolate.AspNetCore" Version="15.0.3" />
+    <PackageReference Include="HotChocolate.AspNetCore.Authorization" Version="15.0.3" />
+    <PackageReference Include="HotChocolate.Data" Version="15.0.3" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.7">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+    <PackageReference Include="OpenTelemetry" Version="1.10.0" />
+    <PackageReference Include="OpenTelemetry.Exporter.Console" Version="1.10.0" />
+    <PackageReference Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" Version="1.10.0" />
+    <PackageReference Include="OpenTelemetry.Extensions.Hosting" Version="1.10.0" />
+    <PackageReference Include="OpenTelemetry.Instrumentation.Http" Version="1.9.0" />
+    <PackageReference Include="Polly" Version="8.5.0" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="7.0.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="EI.API.ServiceDefaults" Version="1.1.30" />
+    <!-- <ProjectReference Include="..\..\..\..\dev-infra\src\common\defaults\EI.API.ServiceDefaults.csproj" /> -->
+    <PackageReference Include="EI.API.Service.Rest.Helpers" Version="1.1.35" />
+    <!-- <ProjectReference Include="..\..\..\..\dev-infra\src\common\rest.helpers\EI.API.Service.Rest.Helpers.csproj" /> -->
+    <PackageReference Include="EI.API.Service.Data.Helpers" Version="1.1.28" />
+    <!-- <ProjectReference Include="..\..\..\..\dev-infra\src\common\data.helpers\EI.API.Service.Data.Helpers.csproj" /> -->
+    <PackageReference Include="EI.API.Cloud.Clients" Version="1.1.14" />
+    <!--<ProjectReference Include="..\..\..\..\dev-infra\src\common\cloud\EI.API.Cloud.Clients.csproj" />-->
+  </ItemGroup>
+</Project>

@@ -1,0 +1,11 @@
+FROM mcr.microsoft.com/dotnet/aspnet:8.0
+
+# Install the .NET Core Remote Debugger
+RUN apt-get update && \
+    apt-get install -y unzip && \
+    curl -sSL https://aka.ms/getvsdbgsh | bash /dev/stdin -v latest -l /vsdbg
+
+WORKDIR /app
+COPY ./publish ./
+EXPOSE 5160
+ENTRYPOINT ["dotnet", "EI.API.ProcessLogging.dll"]

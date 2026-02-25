@@ -1,0 +1,132 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "ComponentRegistration",
+  "type": "object",
+  "properties": {
+    "endpoint": {
+      "type": "object",
+      "properties": {
+        "applicationId": { "type": "string" },
+        "endpointType": { "type": "string" },
+        "endpointKey": { "type": "string" },
+        "endpointUri": { "type": "string" }
+      },
+      "required": [
+        "applicationId",
+        "endpointType",
+        "endpointKey",
+        "endpointUri"
+      ]
+    },
+    "components": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "componentName": { "type": "string" },
+          "ComponentKey": { "type": "string" },
+          "ComponentType": { "type": "string" },
+          "federationRemote": { "type": "string" },
+          "properties": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "object",
+              "anyOf": [
+                {
+                  "properties": {
+                    "dataType": { "type": "string" },
+                    "required": { "type": "boolean" },
+                    "description": { "type": "string" },
+                    "defaultValue": {},
+                    "name": { "type": "string" },
+                    "element": {
+                      "type": "object",
+                      "properties": {
+                        "dataType": { "type": "string" },
+                        "name": { "type": "string" },
+                        "properties": {
+                          "type": "object",
+                          "additionalProperties": {
+                            "$ref": "#/definitions/propertySchema"
+                          }
+                        }
+                      },
+                      "required": ["dataType", "properties"]
+                    }
+                  },
+                  "required": [
+                    "dataType",
+                    "required",
+                    "description",
+                    "defaultValue"
+                  ]
+                },
+                {
+                  "properties": {
+                    "kind": { "const": "union" },
+                    "types": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "dataType": { "type": "string" }
+                        },
+                        "required": ["dataType"]
+                      }
+                    },
+                    "required": { "type": "boolean" },
+                    "description": { "type": "string" },
+                    "defaultValue": {},
+                    "name": { "type": "string" }
+                  },
+                  "required": ["kind", "types"]
+                }
+              ]
+            }
+          }
+        },
+        "required": [
+          "componentName",
+          "ComponentKey",
+          "ComponentType",
+          "federationRemote",
+          "properties"
+        ]
+      }
+    }
+  },
+  "required": ["endpoint", "components"],
+  "definitions": {
+    "propertySchema": {
+      "type": "object",
+      "anyOf": [
+        {
+          "properties": {
+            "dataType": { "type": "string" },
+            "required": { "type": "boolean" },
+            "description": { "type": "string" },
+            "defaultValue": {},
+            "name": { "type": "string" }
+          },
+          "required": ["dataType", "required", "description", "defaultValue"]
+        },
+        {
+          "properties": {
+            "kind": { "const": "union" },
+            "types": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "dataType": { "type": "string" }
+                },
+                "required": ["dataType"]
+              }
+            }
+          },
+          "required": ["kind", "types"]
+        }
+      ]
+    }
+  }
+}

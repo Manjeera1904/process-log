@@ -1,0 +1,4 @@
+{
+  "./bootstrap": "src/export/bootstrap.ts",
+  "./widgets": "src/export/widgets.ts"
+}

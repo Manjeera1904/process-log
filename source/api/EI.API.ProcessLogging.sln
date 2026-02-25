@@ -1,0 +1,48 @@
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.11.35312.102
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EI.API.ProcessLogging", "EI.API.ProcessLogging\EI.API.ProcessLogging.csproj", "{7A65AB73-3DB6-472F-916E-2319165368D1}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EI.API.ProcessLogging.Tests", "EI.API.ProcessLogging.Tests\EI.API.ProcessLogging.Tests.csproj", "{CDCECFF1-0EFC-441D-8B3F-B687C2EB1368}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EI.API.ProcessLogging.IntegrationTests", "EI.API.ProcessLogging.IntegrationTests\EI.API.ProcessLogging.IntegrationTests.csproj", "{24B23A88-4814-4CA5-94BA-9996D928C752}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EI.API.ProcessLogging.Data", "EI.API.ProcessLogging.Data\EI.API.ProcessLogging.Data.csproj", "{04D7F16A-31FD-43F0-B0D6-051F5B962B0D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EI.API.ProcessLogging.Worker", "EI.API.ProcessLogging.Worker\EI.API.ProcessLogging.Worker.csproj", "{26B28C52-E81A-864B-BC1B-F8B90FA6C3EF}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{7A65AB73-3DB6-472F-916E-2319165368D1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7A65AB73-3DB6-472F-916E-2319165368D1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7A65AB73-3DB6-472F-916E-2319165368D1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7A65AB73-3DB6-472F-916E-2319165368D1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CDCECFF1-0EFC-441D-8B3F-B687C2EB1368}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CDCECFF1-0EFC-441D-8B3F-B687C2EB1368}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CDCECFF1-0EFC-441D-8B3F-B687C2EB1368}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CDCECFF1-0EFC-441D-8B3F-B687C2EB1368}.Release|Any CPU.Build.0 = Release|Any CPU
+		{24B23A88-4814-4CA5-94BA-9996D928C752}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{24B23A88-4814-4CA5-94BA-9996D928C752}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{24B23A88-4814-4CA5-94BA-9996D928C752}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{24B23A88-4814-4CA5-94BA-9996D928C752}.Release|Any CPU.Build.0 = Release|Any CPU
+		{04D7F16A-31FD-43F0-B0D6-051F5B962B0D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{04D7F16A-31FD-43F0-B0D6-051F5B962B0D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{04D7F16A-31FD-43F0-B0D6-051F5B962B0D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{04D7F16A-31FD-43F0-B0D6-051F5B962B0D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{26B28C52-E81A-864B-BC1B-F8B90FA6C3EF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{26B28C52-E81A-864B-BC1B-F8B90FA6C3EF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{26B28C52-E81A-864B-BC1B-F8B90FA6C3EF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{26B28C52-E81A-864B-BC1B-F8B90FA6C3EF}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {EB3C8389-6CA4-45D3-87A5-C3C89D68D7B1}
+	EndGlobalSection
+EndGlobal

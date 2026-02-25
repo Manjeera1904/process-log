@@ -1,0 +1,60 @@
+name: vantange-processlogging
+
+services:
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: processlogging-sqlserver
+    environment:
+      SA_PASSWORD: "1nt39rat10n-t3st1n9-0n1y"
+      ACCEPT_EULA: "Y"
+    ports:
+      - "1434:1433"
+    volumes:
+      - sqlserverdata:/var/opt/mssql
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/mssql-tools18/bin/sqlcmd -C -S localhost -U sa -P 1nt39rat10n-t3st1n9-0n1y -Q 'SELECT 1'"]
+      interval: 3s
+      retries: 10
+
+  processlog-api:
+    build:
+      context: .
+      dockerfile: Dockerfile.prebuilt
+      ##########################################################################################
+      # Swap to this Dockerfile to include debugging tools in the image:
+      # dockerfile: Dockerfile.debuggable
+      ##########################################################################################
+    container_name: processlog-api
+    environment:
+      # Required for API Authentication & Authorization:
+      ConnectionStrings__AzureKeyVault: https://kv-eclipsesaas-dev.vault.azure.net/
+      AZURE_TENANT_ID: "${AZURE_TENANT_ID}"
+      AZURE_CLIENT_ID: "${AZURE_CLIENT_ID}"
+      AZURE_CLIENT_SECRET: "${AZURE_CLIENT_SECRET}"
+      # Mocked secret that is required to "resolve" the KeyVault secret for the Process Log DataSource (when using local dev data)
+      LocalDevOnly_SqlDb_Secret: "{\"username\": \"sa\", \"password\": \"1nt39rat10n-t3st1n9-0n1y\"}"
+      # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+      #  Set up special override for the Process Log database
+      EI_INTEGRATION_TESTING_CLIENT_ID: "aa71e350-8e5c-4118-88f7-792381ba6936"
+      SERVICES__PLATFORMCOREAPI__HTTPS__0: "https://aca-platform-core-api-dev.livelybush-f915b3b5.eastus.azurecontainerapps.io"
+      # SERVICES__PLATFORMCOREAPI__HTTPS__0: "http://host.docker.internal:5159"
+      # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+      ASPNETCORE_ENVIRONMENT: "Development"
+      ASPNETCORE_URLS: "http://+:5160"
+      ##########################################################################################
+      # Add the following environment variables for debugging
+      # DOTNET_USE_POLLING_FILE_WATCHER: "1"
+      # ASPNETCORE_HOSTINGSTARTUPASSEMBLIES: "Microsoft.AspNetCore.Server.IISIntegration"
+      ##########################################################################################
+    depends_on:
+      sqlserver:
+        condition: service_healthy
+      # sql-migration-sidecar:
+      #   condition: service_completed_successfully
+    ports:
+      - "5160:5160"
+      - "7085:7085"
+      - "4020:4020" # Expose the port for the remote debugger
+
+volumes:
+  sqlserverdata:

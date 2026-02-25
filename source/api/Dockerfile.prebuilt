@@ -1,0 +1,11 @@
+FROM mcr.microsoft.com/dotnet/aspnet:8.0
+
+# Install curl
+RUN apt-get update && apt-get install -y curl
+
+WORKDIR /app
+COPY ./publish/api ./
+# ENV ASPNETCORE_URLS=https://localhost:7084;http://localhost:5191
+# EXPOSE 7084
+EXPOSE 5160
+ENTRYPOINT ["dotnet", "EI.API.ProcessLogging.dll"]

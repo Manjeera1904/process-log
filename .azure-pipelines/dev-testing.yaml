@@ -1,0 +1,30 @@
+name: 'Testing Dev Environment'
+
+trigger: none
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+stages:
+- stage: test_dev_environment
+  displayName: Testing Dev Environment
+  jobs:
+    - deployment: test_dev_environment
+      displayName: "Testing Dev Environment"
+      environment: dev
+      timeoutInMinutes: 60
+      workspace:
+        clean: all
+      strategy:
+        runOnce:
+          deploy:
+            steps:
+
+            - checkout: self
+              persistCredentials: true
+              displayName: 'Checkout self branch'
+
+            - template: ui-test-template.yaml
+              parameters:
+                environmentName: dev
+                

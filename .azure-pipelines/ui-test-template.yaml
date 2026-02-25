@@ -1,0 +1,171 @@
+parameters:
+  environmentName: ""
+  AZURE_TENANT_ID: ""
+  AZURE_CLIENT_ID: ""
+  AZURE_CLIENT_SECRET: ""
+  SERVICEBUS_NAMESPACE: ""
+  SERVICEBUS_TOPIC: ""
+  SERVICEBUS_SUBSCRIPTION_1 : ""
+  SERVICEBUS_SUBSCRIPTION_2 : ""
+  SERVICEBUS_TOPIC_APPLICATION: ""
+  
+steps:
+
+  - pwsh: |
+      $allowedEnvs = @("int", "dev", "test", "lab", "demo")
+      $envName = "${{ parameters.environmentName }}"
+      if ($allowedEnvs -contains $envName) {
+        $secretsEnv = $envName
+      } else {
+        $secretsEnv = "int"
+      }
+      echo "##vso[task.setvariable variable=validatedEnv;isOutput=true]$secretsEnv"
+    displayName: 'Validate environment'
+    name: validateEnv
+
+  - script: |
+      sudo apt-get update
+      sudo apt-get install -y google-chrome-stable xvfb python3-tk python3-dev
+      # Install ChromeDriver
+      chrome_version=$(google-chrome --version | grep -oP '\d+\.\d+\.\d+')
+      wget -N https://chromedriver.storage.googleapis.com/$chrome_version/chromedriver_linux64.zip -P ~/
+      unzip ~/chromedriver_linux64.zip -d ~/
+      sudo mv -f ~/chromedriver /usr/local/bin/chromedriver
+      sudo chown root:root /usr/local/bin/chromedriver
+      sudo chmod 0755 /usr/local/bin/chromedriver
+      # Install Python dependencies
+      python3 -m pip install --upgrade pip
+      pip3 install -r source/api/Tests/requirements.txt
+      pip3 install -r source/web/Tests/requirements.txt
+    displayName: 'Set up environment and install dependencies'
+    env:
+      PYTHON_VERSION: '3.x'
+  
+  - task: AzureCLI@2
+    continueOnError: true
+    inputs:
+      azureSubscription: "Azure_ExlipseInsightsSaaS"
+      scriptType: "pscore"
+      scriptLocation: "inlineScript"
+      inlineScript: |
+        $keyVaultName = "kv-eclipsesaas-test"
+        
+        # Initialize an array to hold the secrets
+        $secretsArray = @()
+
+        # List all secrets in the Key Vault
+        $secrets = az keyvault secret list --vault-name $keyVaultName --query "[].id" -o tsv
+
+        # Loop through each secret and check if it starts with "eclipse-testautomation-user"
+        foreach ($secret in $secrets) {
+            $secretName = [System.IO.Path]::GetFileName($secret)
+            if ($secretName -like "eclipse-testautomation-user*") {
+                # Retrieve the secret value
+                $secretValue = az keyvault secret show --vault-name $keyVaultName --name $secretName --query "value" -o tsv
+                
+                # Create a custom object for the secret
+                $secretObject = [PSCustomObject]@{
+                    SecretName = $secretName
+                    SecretValue = $secretValue | ConvertFrom-Json
+                }
+                # Add the secret object to the array
+                $secretsArray += $secretObject
+            }
+        }
+
+        # Convert the array to JSON and save it to a file in the specified folder
+        $secretsJson = $secretsArray | ConvertTo-Json -Depth 3
+        $secretsJson | Out-File -FilePath "source/web/Tests/secrets.json"
+        $secretsJson | Out-File -FilePath "source/api/Tests/secrets.json"
+
+        echo "Running UI tests..."
+        xvfb-run -a python source/web/Tests/runtestsui.py source/web/Tests/secrets.json
+        xvfb-run -a python source/api/Tests/runtestsui.py source/api/Tests/secrets.json
+        xvfb-run -a python source/web/Tests/test_CreateTokenApi.py
+        xvfb-run -a python source/web/Tests/test_createdb.py
+        xvfb-run -a python source/web/Tests/runtests_$(validateEnv.validatedEnv)env.py source/web/Tests/secrets.json
+        
+    displayName: 'Run UI tests'
+    timeoutInMinutes: 40
+    env:
+      ENVIRONMENT: ${{ parameters.environmentName }}
+      PipelineId: 157
+      ProjectName: 'Commercialization'
+      OrganizationName: 'EclipseInsightsHC'
+      SYSTEM_ACCESSTOKEN: $(System.AccessToken)
+  
+  - task: PublishTestResults@2
+    continueOnError: true
+    displayName: 'Publish UI Test Result'
+    inputs:
+      testResultsFiles: |
+        source/web/Tests/test-results-$(validateEnv.validatedEnv)env.xml
+      testResultsFormat: 'JUnit'
+      failTaskOnFailedTests: true
+      testRunTitle: 'UI test results'
+
+  - script: |
+      echo "Checking for screenshots..."
+      SCREENSHOT_DIR="source/web/Tests/screenshots-${{ parameters.environmentName }}"
+      TARGET_DIR="$(Build.ArtifactStagingDirectory)/screenshots"
+
+      mkdir -p "$TARGET_DIR"
+
+      if [ -d "$SCREENSHOT_DIR" ] && [ "$(ls -A "$SCREENSHOT_DIR")" ]; then
+        echo "📸 Screenshots found, uploading..."
+        cp -r "$SCREENSHOT_DIR"/* "$TARGET_DIR"
+        echo "##vso[artifact.upload containerfolder=FailedTestScreenshots-${{ parameters.environmentName }};artifactname=FailedTestScreenshots-${{ parameters.environmentName }}]$TARGET_DIR"
+        echo "##vso[task.logissue type=warning] 📸 Screenshots uploaded: https://dev.azure.com/EclipseInsightsHC/$(System.TeamProject)/_build/results?buildId=$(Build.BuildId)&view=artifacts&type=publishedArtifacts"
+        exit 1
+      else
+        echo "No screenshots found. Step passed."
+      fi
+    continueOnError: true
+    displayName: 'Publish UI screenshots on test failures'
+
+  - task: AzureKeyVault@2
+    continueOnError: true
+    displayName: 'Fetch AccessToken from Key Vault'
+    inputs:
+      azureSubscription: 'Azure_ExlipseInsightsSaaS'
+      KeyVaultName: 'kv-eclipsesaas-test'
+      SecretsFilter: 'AccessToken'
+      RunAsPreJob: false
+
+  - script: |
+      # Link test results in DevOps
+      python source/web/Tests/link_test_case.py
+    continueOnError: true
+    displayName: 'Link test results to test case'
+    env:
+      AccessToken: $(AccessToken)
+      Environment: $(validateEnv.validatedEnv)
+
+  - task: AzureCLI@2
+    continueOnError: true
+    inputs:
+      azureSubscription: "Azure_ExlipseInsightsSaaS"
+      scriptType: "pscore"
+      scriptLocation: "inlineScript"
+      inlineScript: |
+        python source/api/Tests/runtests.py
+    displayName: 'Run API Tests'
+    env:
+      ENVIRONMENT: ${{ parameters.environmentName }}
+      AZURE_TENANT_ID: ${{ parameters.AZURE_TENANT_ID }}
+      AZURE_CLIENT_ID: ${{ parameters.AZURE_CLIENT_ID }}
+      AZURE_CLIENT_SECRET: ${{ parameters.AZURE_CLIENT_SECRET }}
+      SERVICEBUS_NAMESPACE: ${{ parameters.SERVICEBUS_NAMESPACE }}
+      SERVICEBUS_TOPIC: ${{ parameters.SERVICEBUS_TOPIC }}
+      SERVICEBUS_SUBSCRIPTION_1 : ${{ parameters.SERVICEBUS_SUBSCRIPTION_1 }}
+      SERVICEBUS_TOPIC_APPLICATION : ${{ parameters.SERVICEBUS_TOPIC_APPLICATION }}
+      SERVICEBUS_SUBSCRIPTION_2 : ${{ parameters.SERVICEBUS_SUBSCRIPTION_2 }}
+
+  - task: PublishTestResults@2
+    displayName: 'Publish API Test Results'
+    continueOnError: true
+    inputs:
+      testResultsFiles: 'source/api/Tests/test-results.xml'
+      testResultsFormat: 'JUnit'
+      failTaskOnFailedTests: true
+      testRunTitle: 'Python API Tests'

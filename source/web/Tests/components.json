@@ -1,0 +1,449 @@
+[
+  {
+    "componentName": "ExpandedCard",
+    "ComponentKey": "ExpandedCard",
+    "ComponentType": "component",
+    "federationRemote": "web_process_log/components",
+    "properties": {
+      "insurancePayer": {
+        "dataType": "string",
+        "required": true,
+        "description": "",
+        "defaultValue": null
+      },
+      "services": {
+        "dataType": "string",
+        "required": true,
+        "description": "",
+        "defaultValue": null
+      },
+      "rate": {
+        "dataType": "string",
+        "required": true,
+        "description": "",
+        "defaultValue": null
+      },
+      "summary": {
+        "dataType": "string",
+        "required": true,
+        "description": "",
+        "defaultValue": null
+      },
+      "dates": {
+        "dataType": "string",
+        "required": true,
+        "description": "",
+        "defaultValue": null
+      },
+      "paymentPolicy": {
+        "dataType": "string",
+        "required": true,
+        "description": "",
+        "defaultValue": null
+      },
+      "processLogId": {
+        "dataType": "string",
+        "required": true,
+        "description": "",
+        "defaultValue": null
+      },
+      "actionType": {
+        "dataType": "string",
+        "required": true,
+        "description": "",
+        "defaultValue": null
+      }
+    }
+  },
+  {
+    "componentName": "ProcessMonitorListTable",
+    "ComponentKey": "ProcessMonitorListTable",
+    "ComponentType": "component",
+    "federationRemote": "web_process_log/components",
+    "properties": {
+      "tokenClientId": {
+        "dataType": "string",
+        "required": true,
+        "description": "",
+        "defaultValue": null,
+        "name": "ProcessMonitorListTableProps"
+      },
+      "data": {
+        "dataType": "array",
+        "element": {
+          "dataType": "object",
+          "name": "ProcessItem",
+          "properties": {
+            "type": {
+              "dataType": "string",
+              "required": true,
+              "description": "",
+              "defaultValue": null
+            },
+            "id": {
+              "dataType": "string",
+              "required": true,
+              "description": "",
+              "defaultValue": null
+            },
+            "description": {
+              "dataType": "string",
+              "required": true,
+              "description": "",
+              "defaultValue": null
+            },
+            "client": {
+              "dataType": "string",
+              "required": true,
+              "description": "",
+              "defaultValue": null
+            },
+            "source": {
+              "dataType": "string",
+              "required": true,
+              "description": "",
+              "defaultValue": null
+            },
+            "processedOn": {
+              "dataType": "string",
+              "required": true,
+              "description": "",
+              "defaultValue": null
+            },
+            "duration": {
+              "dataType": "string",
+              "required": true,
+              "description": "",
+              "defaultValue": null
+            },
+            "state": {
+              "kind": "union",
+              "types": [
+                {
+                  "dataType": "import(\"/Users/manojkumarmathiarasan/My Stuff/Codebase/Signa/process-log/source/web/src/constants/enums\").ProcessState.InProgress"
+                },
+                {
+                  "dataType": "import(\"/Users/manojkumarmathiarasan/My Stuff/Codebase/Signa/process-log/source/web/src/constants/enums\").ProcessState.Completed"
+                },
+                {
+                  "dataType": "import(\"/Users/manojkumarmathiarasan/My Stuff/Codebase/Signa/process-log/source/web/src/constants/enums\").ProcessState.Failed"
+                },
+                {
+                  "dataType": "import(\"/Users/manojkumarmathiarasan/My Stuff/Codebase/Signa/process-log/source/web/src/constants/enums\").ProcessState.Pending"
+                },
+                {
+                  "dataType": "import(\"/Users/manojkumarmathiarasan/My Stuff/Codebase/Signa/process-log/source/web/src/constants/enums\").ProcessState.New"
+                },
+                {
+                  "dataType": "import(\"/Users/manojkumarmathiarasan/My Stuff/Codebase/Signa/process-log/source/web/src/constants/enums\").ProcessState.Unknown"
+                }
+              ],
+              "required": true,
+              "description": "",
+              "defaultValue": null
+            },
+            "docs": {
+              "kind": "union",
+              "types": [
+                {
+                  "dataType": "number"
+                }
+              ],
+              "required": false,
+              "description": "",
+              "defaultValue": null
+            },
+            "disposition": {
+              "kind": "union",
+              "types": [
+                {
+                  "dataType": "string"
+                }
+              ],
+              "required": false,
+              "description": "",
+              "defaultValue": null
+            }
+          }
+        },
+        "required": true,
+        "description": "",
+        "defaultValue": null,
+        "name": "ProcessMonitorListTableProps"
+      },
+      "totalRows": {
+        "dataType": "number",
+        "required": true,
+        "description": "",
+        "defaultValue": null,
+        "name": "ProcessMonitorListTableProps"
+      },
+      "page": {
+        "dataType": "number",
+        "required": true,
+        "description": "",
+        "defaultValue": null,
+        "name": "ProcessMonitorListTableProps"
+      },
+      "rowsPerPage": {
+        "dataType": "number",
+        "required": true,
+        "description": "",
+        "defaultValue": null,
+        "name": "ProcessMonitorListTableProps"
+      },
+      "onPageChange": {
+        "dataType": "function",
+        "signatures": [
+          {
+            "parameters": [
+              {
+                "name": "page",
+                "dataType": "number"
+              }
+            ],
+            "returnType": {
+              "dataType": "void"
+            }
+          }
+        ],
+        "binding": "ProcessMonitorListTable.onPageChange",
+        "required": true,
+        "description": "",
+        "defaultValue": null,
+        "name": "ProcessMonitorListTableProps"
+      },
+      "onRowsPerPageChange": {
+        "dataType": "function",
+        "signatures": [
+          {
+            "parameters": [
+              {
+                "name": "rowsPerPage",
+                "dataType": "number"
+              }
+            ],
+            "returnType": {
+              "dataType": "void"
+            }
+          }
+        ],
+        "binding": "ProcessMonitorListTable.onRowsPerPageChange",
+        "required": true,
+        "description": "",
+        "defaultValue": null,
+        "name": "ProcessMonitorListTableProps"
+      },
+      "loading": {
+        "kind": "union",
+        "types": [
+          {
+            "dataType": "false"
+          },
+          {
+            "dataType": "true"
+          }
+        ],
+        "required": false,
+        "description": "",
+        "defaultValue": null,
+        "name": "ProcessMonitorListTableProps"
+      },
+      "order": {
+        "kind": "union",
+        "types": [
+          {
+            "dataType": "\"asc\""
+          },
+          {
+            "dataType": "\"desc\""
+          }
+        ],
+        "required": false,
+        "description": "",
+        "defaultValue": null,
+        "name": "ProcessMonitorListTableProps"
+      },
+      "orderBy": {
+        "kind": "union",
+        "types": [
+          {
+            "dataType": "string"
+          }
+        ],
+        "required": false,
+        "description": "",
+        "defaultValue": null,
+        "name": "ProcessMonitorListTableProps"
+      },
+      "filterText": {
+        "dataType": "string",
+        "required": true,
+        "description": "",
+        "defaultValue": null,
+        "name": "ProcessMonitorListTableProps"
+      },
+      "onSortChange": {
+        "kind": "union",
+        "types": [
+          {
+            "dataType": "function",
+            "signatures": [
+              {
+                "parameters": [
+                  {
+                    "name": "columnId",
+                    "dataType": "string"
+                  }
+                ],
+                "returnType": {
+                  "dataType": "void"
+                }
+              }
+            ],
+            "binding": "ProcessMonitorListTable.onSortChange"
+          }
+        ],
+        "required": false,
+        "description": "",
+        "defaultValue": null,
+        "name": "ProcessMonitorListTableProps"
+      },
+      "onFilterChange": {
+        "kind": "union",
+        "types": [
+          {
+            "dataType": "function",
+            "signatures": [
+              {
+                "parameters": [
+                  {
+                    "name": "filter",
+                    "dataType": "string"
+                  }
+                ],
+                "returnType": {
+                  "dataType": "void"
+                }
+              }
+            ],
+            "binding": "ProcessMonitorListTable.onFilterChange"
+          }
+        ],
+        "required": false,
+        "description": "",
+        "defaultValue": null,
+        "name": "ProcessMonitorListTableProps"
+      },
+      "onExpand": {
+        "kind": "union",
+        "types": [
+          {
+            "dataType": "function",
+            "signatures": [
+              {
+                "parameters": [
+                  {
+                    "name": "index",
+                    "dataType": "number"
+                  },
+                  {
+                    "name": "__type",
+                    "dataType": "object",
+                    "properties": {}
+                  },
+                  {
+                    "name": "isExpanded",
+                    "dataType": "boolean"
+                  }
+                ],
+                "returnType": {
+                  "dataType": "void"
+                }
+              }
+            ],
+            "binding": "ProcessMonitorListTable.onExpand"
+          }
+        ],
+        "required": false,
+        "description": "",
+        "defaultValue": null,
+        "name": "ProcessMonitorListTableProps"
+      },
+      "activityTypes": {
+        "dataType": "array",
+        "element": {
+          "dataType": "object",
+          "name": "ActivityType",
+          "properties": {
+            "id": {
+              "dataType": "string",
+              "required": true,
+              "description": "",
+              "defaultValue": null
+            },
+            "type": {
+              "dataType": "string",
+              "required": true,
+              "description": "",
+              "defaultValue": null
+            },
+            "name": {
+              "dataType": "string",
+              "required": true,
+              "description": "",
+              "defaultValue": null
+            },
+            "description": {
+              "dataType": "string",
+              "required": true,
+              "description": "",
+              "defaultValue": null
+            }
+          }
+        },
+        "required": true,
+        "description": "",
+        "defaultValue": null,
+        "name": "ProcessMonitorListTableProps"
+      },
+      "processStatuses": {
+        "dataType": "array",
+        "element": {
+          "dataType": "object",
+          "name": "ProcessStatus",
+          "properties": {
+            "id": {
+              "dataType": "string",
+              "required": true,
+              "description": "",
+              "defaultValue": null
+            },
+            "status": {
+              "dataType": "string",
+              "required": true,
+              "description": "",
+              "defaultValue": null
+            },
+            "name": {
+              "dataType": "string",
+              "required": true,
+              "description": "",
+              "defaultValue": null
+            },
+            "description": {
+              "dataType": "string",
+              "required": true,
+              "description": "",
+              "defaultValue": null
+            }
+          }
+        },
+        "required": true,
+        "description": "",
+        "defaultValue": null,
+        "name": "ProcessMonitorListTableProps"
+      }
+    }
+  }
+]

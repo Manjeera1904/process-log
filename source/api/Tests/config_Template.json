@@ -1,0 +1,216 @@
+{
+    "common": {
+        "apiVersion": "1.0",
+        "apiVersion2": "2.0",
+        "apiVersion3": "3.0",
+        "updatedBy": "Updated Data",
+        "invalidId": "541",
+        "invalidName": "tske",
+        "invalidKey": "test",
+        "invalidType": "test",
+        "invalidLevel": "test",
+        "dateFrom": "2024-09-01",
+        "dateTo": "9999-10-30",
+        "nonExistingCultureCode": "ects",
+        "nonExistingId": "AAE4943C-65B5-46E1-B68F-01FAD712018A",
+        "testClientId": "",
+        "cultureCode": "en-US",
+        "versionId": "1.0",
+        "versionId2": "2.0",
+        "versionId3": "3.0",
+        "apiBaseUrl": "https://process-logging-api.int.eclipsevantage.com"
+    },
+    "login": {
+        "emailInput": "//input[@id='i0116']",
+        "nextButton": "//input[@id='idSIButton9']",
+        "passwordInput": "//input[@id='i0118']",
+        "signInButton": "//input[@id='idSIButton9' and @value='Sign in']",
+        "totpInput": "//input[@id='idTxtBx_SAOTCC_OTC']",
+        "continueButton": "//input[@id='idSubmit_SAOTCC_Continue']",
+        "staySignedInYesButton": "//input[@id='idSIButton9' and @value='Yes']"
+    },
+    "activityTypeApi": {
+        "activityTypeId": "27a1378d-e392-486e-a63f-8c2414e44c1d",
+        "activityType": "ReceiveFile"
+    },
+    "nonProdHelperApi": {
+        "deleteClients": true,
+        "deleteTenants": true,
+        "deleteProducts": true,
+        "deleteUsers": true,
+        "deleteRoles": true,
+        "deleteDataSources": true
+    },
+    "processStatusApi": {
+        "newId": "4ed43de1-a88d-4e53-8370-51738497c0da",
+        "inProgressId": "6dfe6ee6-36d8-428f-97b2-571def4a6fb4",
+        "pausedId": "8ed812bd-1761-4d34-ad12-f4d9515ff43e",
+        "completedId": "efd534e1-db63-4b03-a36e-523fa9c14963",
+        "failedId": "c59f50b2-d7c2-4a6f-897c-5b9ec0d3d539",
+        "cancelledId": "d40d80f7-eb09-4f95-86fa-79ff569e7907",
+        "duplicateId": "d7c7ae65-285e-47a4-b421-5bdc9b39aec2",
+        "validStatuses": [
+            "New",
+            "InProgress",
+            "Paused",
+            "Completed",
+            "Failed",
+            "Cancelled",
+            "Duplicate"
+        ],
+        "status": "New"
+    },
+    "processLogApi": {
+        "id": null,
+        "updatedBy": "lavanya",
+        "rowVersion": "",
+        "type": "ReceiveFile",
+        "activityType": "ReceiveFile",
+        "status": [
+            "New",
+            "InProgress",
+            "Paused",
+            "Completed",
+            "Failed",
+            "Cancelled",
+            "Duplicate"
+        ],
+        "startTimeStamp": "2024-11-01T12:08:42.336039Z",
+        "lastUpdatedTimeStamp": "2024-11-01T12:08:42.336039Z",
+        "sortBy": [
+            "Type",
+            "Status"
+        ],
+        "sortDirection": "desc",
+        "pageNumber": 1,
+        "pageSize": 20,
+        "timeZone": "UTC",
+        "processLogId": "a24e3f80-d5b2-4857-8cc9-851d60e64c52",
+        "TodayStart": "2025-09-16T00:00:00Z",
+        "TodayEnd": "2025-09-16T15:52:00Z",
+        "Last7DaysStart": "2025-09-09T15:52:00Z",
+        "Last7DaysEnd": "2025-09-16T15:52:00Z",
+        "Last14DaysStart": "2025-09-02T15:52:00Z",
+        "Last14DaysEnd": "2025-09-16T15:52:00Z",
+        "Last30DaysStart": "2025-08-17T15:52:00Z",
+        "Last30DaysEnd": "2025-09-16T15:52:00Z"
+    },
+    "messageLevelApi": {
+        "infoId": "0E8D0B7E-811A-47F3-BB5A-B64EB9FB92C8",
+        "statusId": "198AA513-A2A2-4781-9E19-D79AF8947CDD",
+        "warnId": "36304564-2B06-401D-B71F-B9062890EDB9",
+        "errorId": "EE72BDE9-E89D-4BC0-B91B-9294F160FBF9",
+        "fatalId": "7252F49D-CA4C-4623-BE6D-55C90602C1C1",
+        "validLevels": [
+            "Information",
+            "Status",
+            "Warning",
+            "Error",
+            "Fatal"
+        ],
+        "level": "Warning"
+    },
+    "fileProcessLogApi": {
+        "id": null,
+        "updatedBy": "Rahul",
+        "rowVersion": "",
+        "processLogId": "4eaffe7a-6750-4d33-8f2e-da3f122ed4b0",
+        "fileName": "string",
+        "filePath": "string",
+        "fileSize": 0,
+        "fileHash": "string",
+        "fileProcessLogId": ""
+    },
+    "fileProcessLogApiv2": {
+        "id": null,
+        "updatedBy": "Rahul",
+        "rowVersion": "",
+        "processLogId": "4eaffe7a-6750-4d33-8f2e-da3f122ed4b0",
+        "fileName": "test_data",
+        "filePath": "string",
+        "fileSize": 0,
+        "fileHash": "string",
+        "purposeName": "Originating Contract",
+        "processStatus": "New",
+        "fileProcessLogId": ""
+    },
+    "x12InterchangeApi": {
+        "id": null,
+        "updatedBy": "Rahul",
+        "rowVersion": "AAAAAAACKt4=",
+        "fileProcessLogId": "713ec6f7-62b9-4688-ab0f-03d6fd4bbdf8",
+        "status": "Accepted",
+        "interchangeSenderIdQualifier": "Test",
+        "interchangeSenderId": "PlatformConfig",
+        "interchangeReceiverIdQualifier": "Testing",
+        "interchangeReceiverId": "Testing",
+        "interchangeDate": "date",
+        "interchangeTime": "time",
+        "repetitionSeparator": "test",
+        "interchangeControlVersionNumber": "Test",
+        "interchangeControlNumber": "Test",
+        "acknowledgementRequested": "s",
+        "usageIndicator": "s",
+        "componentElementSeparator": "s",
+        "x12InterchangeId": "7259604b-36e8-4d3f-80b1-d0f21022cf35"
+    },
+    "x12FunctionalGroupApi": {
+        "id": null,
+        "updatedBy": "Rahul",
+        "rowVersion": "AAAAAAACKvM=",
+        "x12InterchangeId": "1020f875-0459-4b3c-9df8-4411e9798c32",
+        "status": "Accepted",
+        "functionalIdentifierCode": "St",
+        "applicationSenderCode": "PlatformConfig",
+        "applicationReceiverCode": "PlatformConfig",
+        "date": "date",
+        "time": "time",
+        "groupControlNumber": "time",
+        "responsibleAgencyCode": "st",
+        "versionReleaseIndustryIdentifierCode": "st",
+        "X12FunctionalGroupId": "ca8a09f0-8480-40d5-90a6-161dfa175e73"
+    },
+    "x12StatusApi": {
+        "id": "21c50e68-788d-41c5-a4f1-05d1e9aa00f8",
+        "status": "Accepted"
+    },
+    "x12TransactionSetApi": {
+        "id": null,
+        "updatedBy": "Rahul",
+        "rowVersion": "AAAAAAACKv0=",
+        "x12FunctionalGroupId": "9d3c03c0-ae68-4592-aab5-c1945941c9c5",
+        "status": "Accepted",
+        "transactionSetIdentifierCode": "St",
+        "transactionSetControlNumber": "Testing",
+        "X12TransactionSetId": "2fba213b-cc27-47e1-bed5-5987b3201018"
+    },
+    "processLogMessageApi": {
+        "id": null,
+        "updatedBy": "lavanya",
+        "rowVersion": "",
+        "processLogId": "",
+        "message": "testing",
+        "level": "Warning",
+        "messageTimeStamp": "2024-11-01T12:08:42.336039Z",
+        "processLogMessageId": "5e4e8ff8-db00-4805-ae03-1e43a55ee4d5",
+        "lastMessageTimeStamp": "2024-11-01T12:08:42.336039Z",
+        "fileProcessLogId": "20526a73-5a11-4ad5-99d5-f197c3d4ed4f"
+    },
+    "x12MessageApi": {
+        "id": null,
+        "updatedBy": "Rahul",
+        "rowVersion": "",
+        "x12InterchangeId": "e3473ced-cc6e-4349-8b3c-61e7f0454fbd",
+        "x12FunctionalGroupId": "eb48a267-e767-4749-b685-c6de83c24152",
+        "x12TransactionSetId": "8c0e357c-94cc-4ae0-99df-683c3d536189",
+        "level": "Fatal",
+        "message": "string",
+        "messageTimestamp": "2024-11-05T11:19:05.083Z",
+        "x12MessageId": "b68c5fd0-654d-448b-9230-8e171674b11b"
+    },
+    "tokenApi": {
+        "token": "",
+        "mtoken": "",
+        "idToken": ""
+    }
+}

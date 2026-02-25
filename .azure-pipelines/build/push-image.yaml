@@ -1,0 +1,36 @@
+parameters:
+  webImageName: ''
+  apiImageName: ''
+  imagetag: ''
+  sidecarImageName: ''
+
+steps:
+- ${{ if ne(parameters.webImageName, '') }}:
+  - task: Docker@2
+    displayName: Push Web Image to ACR
+    inputs:
+      command: push
+      repository: ${{ parameters.webImageName }}
+      containerRegistry: 'SaaSContainerRegistry2'
+      tags: |
+        ${{ parameters.imagetag }}
+
+- ${{ if ne(parameters.apiImageName, '') }}:
+  - task: Docker@2
+    displayName: Push API Image to ACR
+    inputs:
+      command: push
+      repository: ${{ parameters.apiImageName }}
+      containerRegistry: 'SaaSContainerRegistry2'
+      tags: |
+        ${{ parameters.imagetag }}
+
+- ${{ if ne(parameters.sidecarImageName, '') }}:
+  - task: Docker@2
+    displayName: Push SideCar Image to ACR
+    inputs:
+      command: push
+      repository: ${{ parameters.sidecarImageName }}
+      containerRegistry: 'SaaSContainerRegistry2'
+      tags: |
+        ${{ parameters.imagetag }}
