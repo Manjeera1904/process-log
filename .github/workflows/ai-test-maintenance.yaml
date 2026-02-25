@@ -22,15 +22,28 @@ jobs:
       - name: Install and Run AI Analyzer
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-          # This tells Python to look in the ai_analyzer folder for your modules
           PYTHONPATH: ${{ github.workspace }}/source/ai_analyzer
         run: |
           python -m pip install --upgrade pip
-          # We install langchain-community and langchain-openai specifically
-          python -m pip install langchain langchain-openai langchain-community openai
+          # Explicitly install langchain-core to fix the 'ModuleNotFoundError'
+          python -m pip install langchain langchain-openai langchain-community langchain-core openai
+          
+          # Create the report directory manually just in case
+          mkdir -p source/reports
+          
+          # Run the actual Python script
           python source/ai_analyzer/main.py
+          
+          # Check if the file was actually created (for debugging)
+          if [ -f source/reports/report.md ]; then
+            echo "✅ report.md found!"
+          else
+            echo "❌ report.md NOT found!"
+            echo "Creating a fallback report..."
+            echo "AI scan failed to generate a report file." > source/reports/report.md
+          fi
         
-      - name: Post AI Report
+      - name: Post AI Report to PR
         uses: thollander/actions-comment-pull-request@v2
         if: github.event_name == 'pull_request'
         with:
