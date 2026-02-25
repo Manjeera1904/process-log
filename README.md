@@ -18,3 +18,24 @@ If you want to learn more about creating good readme files then refer the follow
 - [ASP.NET Core](https://github.com/aspnet/Home)
 - [Visual Studio Code](https://github.com/Microsoft/vscode)
 - [Chakra Core](https://github.com/Microsoft/ChakraCore)
+
+# AI Test Maintenance Assistant
+
+This tool analyzes automation test code and generates non-blocking
+recommendations for improving maintainability.
+
+## Features
+
+- Detect missing assertions
+- Detect hardcoded values
+- Detect long test methods
+- Detect sleep usage
+- Detect duplicate files
+- Detect unused files
+
+## How to Run
+
+```bash
+pip install -r requirements.txt
+cd source/analyzer
+python main.py
