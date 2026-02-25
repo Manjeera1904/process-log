@@ -1,41 +1,37 @@
-name: AI Test Maintenance Assistant
+name: AI Maintenance Assistant
 
 on:
   pull_request:
-    branches: [ main ]
-  # Allows you to run this manually from the Actions tab
+    branches: [ main, master ]
   workflow_dispatch:
 
 jobs:
-  maintenance-scan:
+  analyze:
     runs-on: ubuntu-latest
     permissions:
-      pull-requests: write # Required to post comments
+      pull-requests: write
       contents: read
-
     steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v4
-
-      - name: Set up Python
+      - uses: actions/checkout@v4
+      
+      - name: Setup Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.10'
-          cache: 'pip'
-
+          
       - name: Install Dependencies
         run: |
-          pip install langchain-openai langchain-community openai
-
-      - name: Run AI Analyzer
+          python -m pip install --upgrade pip
+          pip install langchain langchain-openai langchain-community openai
+        
+      - name: Run
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-        # Runs your main.py which generates the report.md
         run: python source/ai_analyzer/main.py
-
-      - name: Post AI Report to PR
+        
+      - name: Comment
         uses: thollander/actions-comment-pull-request@v2
         if: github.event_name == 'pull_request'
         with:
           filePath: source/reports/report.md
-          comment_tag: ai-maintenance-report
+          comment_tag: ai-maintenance

@@ -4,3 +4,7 @@ SQLAlchemy
 pymssql
 azure-servicebus
 azure-identity
+langchain
+langchain-openai
+langchain-community
+openai
