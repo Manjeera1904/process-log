@@ -1,6 +1,7 @@
 import os
 from langchain_openai import ChatOpenAI
-from langchain.prompts import ChatPromptTemplate
+# UPDATED IMPORT PATH
+from langchain_core.prompts import ChatPromptTemplate 
 
 llm = ChatOpenAI(model="gpt-4o", temperature=0)
 
@@ -8,6 +9,7 @@ def analyze_file(file_path):
     with open(file_path, "r", encoding="utf-8") as f:
         code = f.read()
 
+    # The logic remains the same, only the source of ChatPromptTemplate changed
     prompt = ChatPromptTemplate.from_template("""
     Review this test code for:
     - Hardcoded locators (XPaths/CSS)
