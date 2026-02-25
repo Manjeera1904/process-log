@@ -1,21 +1,19 @@
+import hashlib
 import os
-from collections import defaultdict
 
 def detect_duplicates(directory):
-    content_map = defaultdict(list)
-
+    hashes = {}
+    duplicates = []
+    
     for root, _, files in os.walk(directory):
         for file in files:
-            if file.endswith(".js") or file.endswith(".ts"):
+            if file.endswith((".py", ".js", ".ts")):
                 path = os.path.join(root, file)
-                with open(path, "r", encoding="utf-8") as f:
-                    content = f.read()
-                    normalized = content.replace(" ", "").replace("\n", "")
-                    content_map[normalized[:300]].append(path)
-
-    duplicates = []
-    for key, files in content_map.items():
-        if len(files) > 1:
-            duplicates.append(files)
-
+                with open(path, "rb") as f:
+                    file_hash = hashlib.md5(f.read()).hexdigest()
+                
+                if file_hash in hashes:
+                    duplicates.append(f"{path} is a duplicate of {hashes[file_hash]}")
+                else:
+                    hashes[file_hash] = path
     return duplicates

@@ -1,20 +1,26 @@
 import os
+import re
 
 def detect_unused_files(directory):
     all_files = []
-    referenced_files = set()
-
+    all_content = ""
+    
+    # 1. Map all files and read all content
     for root, _, files in os.walk(directory):
         for file in files:
-            if file.endswith(".js") or file.endswith(".ts"):
-                path = os.path.join(root, file)
-                all_files.append(path)
+            if file.endswith((".py", ".js", ".ts")):
+                full_path = os.path.abspath(os.path.join(root, file))
+                all_files.append(full_path)
+                with open(full_path, "r", errors="ignore") as f:
+                    all_content += f.read()
 
-                with open(path, "r", encoding="utf-8") as f:
-                    content = f.read()
-                    for other in files:
-                        if other in content:
-                            referenced_files.add(os.path.join(root, other))
-
-    unused = [f for f in all_files if f not in referenced_files]
+    unused = []
+    for file_path in all_files:
+        file_name = os.path.basename(file_path).split('.')[0]
+        # Check if the filename is mentioned (imported) anywhere in the codebase
+        if file_name not in all_content:
+            # Avoid flagging main or config files
+            if "main" not in file_name and "config" not in file_name:
+                unused.append(file_path)
+                
     return unused

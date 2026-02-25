@@ -1,35 +1,30 @@
 import os
-import re
+from langchain_openai import ChatOpenAI
+from langchain.prompts import ChatPromptTemplate
+
+# Initialize the LLM
+llm = ChatOpenAI(model="gpt-4o", temperature=0)
 
 def analyze_file(file_path):
-    issues = []
-
     with open(file_path, "r", encoding="utf-8") as f:
-        content = f.read()
-        lines = content.split("\n")
+        code_content = f.read()
 
-    # 1️⃣ Missing Assertions
-    if "expect(" not in content and "assert" not in content:
-        issues.append("❌ No assertions found in file.")
-
-    # 2️⃣ Sleep Usage
-    if "sleep(" in content or "wait(" in content:
-        issues.append("⚠️ Possible hard wait detected (sleep/wait). Use explicit waits.")
-
-    # 3️⃣ Hardcoded values (basic detection)
-    hardcoded_strings = re.findall(r'\"[A-Za-z0-9@#$%^&*()_+=-]{6,}\"', content)
-    if hardcoded_strings:
-        issues.append(f"⚠️ Hardcoded values detected: {hardcoded_strings[:3]}")
-
-    # 4️⃣ Long Test Method Detection (>40 lines)
-    test_blocks = re.findall(r'it\((.*?)\{([\s\S]*?)\}\);', content)
-    for block in test_blocks:
-        block_lines = block[1].split("\n")
-        if len(block_lines) > 40:
-            issues.append("⚠️ Long test method detected (>40 lines). Consider refactoring.")
-
-    # 5️⃣ Index-based XPath
-    if re.search(r'\(//.*?\)\[\d+\]', content):
-        issues.append("⚠️ Index-based XPath detected. Avoid unstable locators.")
-
-    return issues
+    # Specialized Prompt for Maintenance Requirements
+    prompt = ChatPromptTemplate.from_template("""
+    Act as a Senior SDET. Analyze the following code from {file_path}.
+    Identify only the following:
+    1. Hardcoded locators (e.g., long XPaths) or sensitive data.
+    2. Weak validations (e.g., missing assertions or using 'sleep' instead of waits).
+    3. Naming convention issues.
+    
+    If no issues are found, return nothing.
+    Code:
+    {code}
+    """)
+    
+    chain = prompt | llm
+    response = chain.invoke({"file_path": file_path, "code": code_content})
+    
+    # Return as a list for main.py to iterate
+    suggestions = response.content.strip().split('\n')
+    return [s for s in suggestions if s.strip()]
