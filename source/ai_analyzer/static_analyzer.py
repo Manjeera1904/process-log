@@ -1,35 +1,33 @@
 import os
-import re
+from google import genai
 
 def analyze_file(file_path):
-    issues = []
+    api_key = os.getenv("GOOGLE_API_KEY")
+    if not api_key:
+        return "### ❌ Error\nGOOGLE_API_KEY not found."
+
+    client = genai.Client(api_key=api_key)
+    
+    if not os.path.exists(file_path):
+        return f"### ❌ Error\nFile `{file_path}` not found."
 
     with open(file_path, "r", encoding="utf-8") as f:
-        content = f.read()
-        lines = content.split("\n")
+        code = f.read()
 
-    # 1️⃣ Missing Assertions
-    if "expect(" not in content and "assert" not in content:
-        issues.append("❌ No assertions found in file.")
+    # We tell the AI EXACTLY how to format the response
+    system_prompt = (
+        "You are a Senior QA Automation Lead. Analyze the provided test code. "
+        "Your output MUST be a Markdown table with the following columns: "
+        "Issue Type, Line Number, Description, and Recommended Fix. "
+        "Focus on: Hardcoded locators, Weak waits (Thread.sleep), and Missing assertions."
+    )
 
-    # 2️⃣ Sleep Usage
-    if "sleep(" in content or "wait(" in content:
-        issues.append("⚠️ Possible hard wait detected (sleep/wait). Use explicit waits.")
-
-    # 3️⃣ Hardcoded values (basic detection)
-    hardcoded_strings = re.findall(r'\"[A-Za-z0-9@#$%^&*()_+=-]{6,}\"', content)
-    if hardcoded_strings:
-        issues.append(f"⚠️ Hardcoded values detected: {hardcoded_strings[:3]}")
-
-    # 4️⃣ Long Test Method Detection (>40 lines)
-    test_blocks = re.findall(r'it\((.*?)\{([\s\S]*?)\}\);', content)
-    for block in test_blocks:
-        block_lines = block[1].split("\n")
-        if len(block_lines) > 40:
-            issues.append("⚠️ Long test method detected (>40 lines). Consider refactoring.")
-
-    # 5️⃣ Index-based XPath
-    if re.search(r'\(//.*?\)\[\d+\]', content):
-        issues.append("⚠️ Index-based XPath detected. Avoid unstable locators.")
-
-    return issues
+    try:
+        response = client.models.generate_content(
+            model="gemini-2.0-flash",
+            contents=f"Analyze this code:\n\n{code}",
+            config={"system_instruction": system_prompt}
+        )
+        return response.text
+    except Exception as e:
+        return f"### ❌ AI Analysis Failed\n{str(e)}"

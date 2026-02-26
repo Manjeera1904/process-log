@@ -1,63 +1,49 @@
 import os
 import sys
+# Ensures the script finds local imports in the same folder
+sys.path.append(os.path.dirname(__file__))
 
-# Fix import path issue
-CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
-sys.path.append(CURRENT_DIR)
-
+from dead_code_detector import detect_dead_code
 from static_analyzer import analyze_file
-from duplication_detector import detect_duplicates
-from dead_code_detector import detect_unused_files
 
+def main():
+    # 1. Run Dead Code Detection
+    dead_code = detect_dead_code()
+    
+    # 2. Run Static Analysis on a sample test file
+    # Change 'sample_test.py' to a file that exists in your 'source/web' folder
+    test_file = "source/web/sample_test.py" 
+    smells = analyze_file(test_file)
 
-BASE_DIR = CURRENT_DIR
+    # 3. Final Report generation using Gemini
+    api_key = os.getenv("GOOGLE_API_KEY")
+    from google import genai
+    client = genai.Client(api_key=api_key)
 
-# Full repo scan (go up to PROCESS-LOG root)
-TARGET_DIRECTORY = os.path.abspath(os.path.join(BASE_DIR, "..", ".."))
+    final_prompt = f"""
+    Format a QA Maintenance Report based on these findings:
+    
+    UNLINKED/DEAD FILES:
+    {dead_code}
+    
+    CODE SMELLS IN {test_file}:
+    {smells}
+    
+    Provide clear refactoring steps.
+    """
 
-# Save report in source/reports
-REPORT_PATH = os.path.abspath(os.path.join(BASE_DIR, "..", "reports", "report.md"))
+    response = client.models.generate_content(
+        model="gemini-2.0-flash",
+        contents=final_prompt
+    )
 
-
-def generate_report():
-    report_lines = []
-    report_lines.append("# 🤖 AI Test Maintenance Report\n")
-    report_lines.append(f"Scanning: {TARGET_DIRECTORY}\n")
-
-    for root, dirs, files in os.walk(TARGET_DIRECTORY):
-        for file in files:
-            if file.endswith((".py", ".yaml", ".yml", ".js", ".ts", ".html", ".md")):
-                file_path = os.path.join(root, file)
-                try:
-                    issues = analyze_file(file_path)
-                    if issues:
-                        report_lines.append(f"\n## 📄 {file_path}")
-                        for issue in issues:
-                            report_lines.append(f"- {issue}")
-                except Exception as e:
-                    report_lines.append(f"\n⚠️ Error analyzing {file_path}: {str(e)}")
-
-    duplicates = detect_duplicates(TARGET_DIRECTORY)
-    if duplicates:
-        report_lines.append("\n## 🔁 Duplicate Files Detected")
-        for group in duplicates:
-            report_lines.append(f"- {group}")
-
-    unused = detect_unused_files(TARGET_DIRECTORY)
-    if unused:
-        report_lines.append("\n## 🗑️ Unused Files")
-        for file in unused:
-            report_lines.append(f"- {file}")
-
-    # Ensure reports folder exists
-    os.makedirs(os.path.dirname(REPORT_PATH), exist_ok=True)
-
-    with open(REPORT_PATH, "w", encoding="utf-8") as f:
-        f.write("\n".join(report_lines))
-
-    print("✅ Report generated successfully.")
-    print(f"📄 Report location: {REPORT_PATH}")
-
+    # 4. Save the report to the path shown in your screenshot
+    report_path = "source/reports/report.md"
+    os.makedirs(os.path.dirname(report_path), exist_ok=True)
+    with open(report_path, "w") as f:
+        f.write(response.text)
+    
+    print(f"✅ POC Complete! Report generated at {report_path}")
 
 if __name__ == "__main__":
-    generate_report()
+    main()
