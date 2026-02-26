@@ -21,7 +21,7 @@ jobs:
           
       - name: Install and Run AI Analyzer
         env:
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           PYTHONPATH: ${{ github.workspace }}/source/ai_analyzer
         run: |
           python -m pip install --upgrade pip

@@ -37,5 +37,5 @@ recommendations for improving maintainability.
 
 ```bash
 pip install -r requirements.txt
-cd source/analyzer
+cd source/ai_analyzer
 python main.py

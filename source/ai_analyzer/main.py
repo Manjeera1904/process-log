@@ -1,7 +1,7 @@
 import os
 import sys
 
-# Ensure neighbor scripts can be imported
+# 1. Setup paths
 CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(CURRENT_DIR)
 
@@ -9,7 +9,7 @@ from static_analyzer import analyze_file
 from duplication_detector import detect_duplicates
 from dead_code_detector import detect_unused_files
 
-# Use GITHUB_WORKSPACE (root) or local fallback
+# Ensure we are at the root
 REPO_ROOT = os.environ.get('GITHUB_WORKSPACE', os.path.abspath(os.path.join(CURRENT_DIR, "../../")))
 REPORT_DIR = os.path.join(REPO_ROOT, "source", "reports")
 REPORT_PATH = os.path.join(REPORT_DIR, "report.md")
@@ -17,43 +17,53 @@ REPORT_PATH = os.path.join(REPORT_DIR, "report.md")
 def run_pipeline():
     os.makedirs(REPORT_DIR, exist_ok=True)
     report = ["# 🤖 AI Test Maintenance Report\n"]
+    report.append("## 🔍 Files Scanned\n")
     
-    print(f"🚀 Starting scan at REPO_ROOT: {REPO_ROOT}")
+    print(f"🚀 Starting scan at: {REPO_ROOT}")
     
-    # 1. AI Analysis
+    found_any_files = False
+
+    # 2. AI Analysis Loop
     for root, dirs, files in os.walk(REPO_ROOT):
-        # SKIP unnecessary folders to speed up the scan and clean up logs
+        # Skip system folders
         if any(ignored in root for ignored in [".git", "__pycache__", "node_modules", "ai_analyzer", "reports"]):
             continue
             
-        # THIS IS THE LINE: It prints the current folder being scanned
-        print(f"📂 Scanning folder: {root}")
-
         for file in files:
+            # Check for Python, JS, TS (Add others if needed)
             if file.endswith((".py", ".js", ".ts")):
+                found_any_files = True
                 path = os.path.join(root, file)
-                # This line prints to the GitHub Logs so you can see it working
-                print(f"🔍 I found this file: {path}") 
+                rel_path = os.path.relpath(path, REPO_ROOT)
                 
-                issues = analyze_file(path)
+                print(f"📄 Found file: {rel_path} - Sending to AI...")
                 
-                # CHANGE: Even if there are no issues, let's list the file in the report
-                relative_path = os.path.relpath(path, REPO_ROOT)
-                if "No issues" in issues or not issues.strip():
-                    report.append(f"### ✅ {relative_path}\nStatus: Checked. Code looks clean!\n")
-                else:
-                    report.append(f"### ❌ {relative_path}\n{issues}\n")
+                try:
+                    issues = analyze_file(path)
+                    if "No issues" in issues or not issues.strip():
+                        report.append(f"### ✅ {rel_path}\n* Status: Clean\n")
+                    else:
+                        report.append(f"### ❌ {rel_path}\n{issues}\n")
+                except Exception as e:
+                    print(f"   ⚠️ Error: {e}")
 
-    # 2. Add Duplicates and Unused to the report
-    duplicates = detect_duplicates(REPO_ROOT)
-    if duplicates:
-        report.append("## 🔁 Duplicate Files\n" + "\n".join([f"- {d}" for d in duplicates]))
+    if not found_any_files:
+        print("❌ No test files found! Check your folder structure.")
+        report.append("> ⚠️ No supported files (.py, .js, .ts) were found in the repository.")
+
+    # 3. Standard Detectors
+    report.append("\n---\n## ⚙️ Maintenance Checks")
+    
+    dupes = detect_duplicates(REPO_ROOT)
+    report.append(f"\n### 🔁 Duplicates\n" + ("\n".join([f"- {d}" for d in dupes]) if dupes else "No duplicates found."))
 
     unused = detect_unused_files(REPO_ROOT)
-    if unused:
-        report.append("## 🗑️ Unused Files\n" + "\n".join([f"- {u}" for u in unused]))
+    report.append(f"\n### 🗑️ Unused Code\n" + ("\n".join([f"- {u}" for u in unused]) if unused else "No unused files found."))
 
+    # 4. Save
     with open(REPORT_PATH, "w", encoding="utf-8") as f:
         f.write("\n".join(report))
-        
-    print(f"✅ Created report at: {REPORT_PATH}")
+    print(f"✅ Report saved to: {REPORT_PATH}")
+
+if __name__ == "__main__":
+    run_pipeline()

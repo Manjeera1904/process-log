@@ -1,27 +1,29 @@
 import os
-from langchain_openai import ChatOpenAI
-# UPDATED IMPORT PATH
-from langchain_core.prompts import ChatPromptTemplate 
+# 1. Change the import from OpenAI to Anthropic
+from langchain_anthropic import ChatAnthropic 
+from langchain_core.prompts import ChatPromptTemplate
 
-llm = ChatOpenAI(model="gpt-4o", temperature=0)
+# 2. Setup Claude (using Claude 3.5 Sonnet is usually best for code)
+llm = ChatAnthropic(
+    model="claude-3-5-sonnet-20240620", 
+    temperature=0,
+    # It will automatically look for ANTHROPIC_API_KEY in your env
+)
 
 def analyze_file(file_path):
     with open(file_path, "r", encoding="utf-8") as f:
         code = f.read()
 
-    # The logic remains the same, only the source of ChatPromptTemplate changed
     prompt = ChatPromptTemplate.from_template("""
-        Review this automation code for the following:
-        1. Code Smells: Hardcoded locators, time.sleep, missing assertions, indexing in locators.
-        2. Refactoring: Suggest where logic can be moved to a Page Object or Shared Utility.
-        3. Readability: Suggest better naming if methods are confusing.
-        4. Maintenance: Identify overly complex or lengthy test methods.
-
-        File: {path}
-        Code: {code}
-
-        Return a bulleted list of improvement areas. If the code is perfect, return 'No issues'.
-        """)
+    Review this test code for:
+    - Hardcoded locators (XPaths/CSS)
+    - Weak waits (Thread.sleep/time.sleep)
+    - Missing assertions
+    File: {path}
+    Code: {code}
+    Return a bulleted list of issues. If none, return 'No issues'.
+    """)
+    
     chain = prompt | llm
     res = chain.invoke({"path": file_path, "code": code})
     return res.content.strip()
