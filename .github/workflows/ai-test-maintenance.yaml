@@ -22,8 +22,11 @@ jobs:
     - name: Install Dependencies
       run: |
         pip install google-genai
-        pip install langchain-google-genai langchain-core
-        # Add any other dependencies your sub-scripts need here
+
+    - name: Run AI Maintenance Analysis
+      env:
+        GOOGLE_API_KEY: ${{ secrets.GEMINI_API_KEY }} 
+      run: python source/ai_analyzer/main.py
 
     - name: Run AI Maintenance Analysis
       env:

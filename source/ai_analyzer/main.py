@@ -1,55 +1,49 @@
 import os
-from google import genai
-# Import your existing logic
+import sys
+# Ensures the script finds local imports in the same folder
+sys.path.append(os.path.dirname(__file__))
+
 from dead_code_detector import detect_dead_code
-from static_analyzer import analyze_file  # Note: Ensure this matches your static_analyzer function name
+from static_analyzer import analyze_file
 
-def generate_ai_maintenance_report():
-    # 1. Securely get the API Key from Environment Variables
-    # The YAML will pass 'GOOGLE_API_KEY' here
-    api_key = os.getenv("GOOGLE_API_KEY")
+def main():
+    # 1. Run Dead Code Detection
+    dead_code = detect_dead_code()
     
-    if not api_key:
-        print("Error: GOOGLE_API_KEY not found in environment!")
-        return
+    # 2. Run Static Analysis on a sample test file
+    # Change 'sample_test.py' to a file that exists in your 'source/web' folder
+    test_file = "source/web/sample_test.py" 
+    smells = analyze_file(test_file)
 
+    # 3. Final Report generation using Gemini
+    api_key = os.getenv("GOOGLE_API_KEY")
+    from google import genai
     client = genai.Client(api_key=api_key)
 
-    # 2. Get data from your existing scripts
-    # Note: Ensure these functions return strings or lists
-    dead_code_results = detect_dead_code()
+    final_prompt = f"""
+    Format a QA Maintenance Report based on these findings:
     
-    # Using the analyze_file function from your other script
-    # You might need to loop through files or pass a specific one
-    static_smells = analyze_file("source/tests/sample_test.py") 
-
-    # 3. Construct the prompt for Gemini
-    prompt = f"""
-    Analyze the following QA Automation findings and provide refactoring suggestions:
+    UNLINKED/DEAD FILES:
+    {dead_code}
     
-    DEAD CODE FOUND: {dead_code_results}
-    CODE SMELLS: {static_smells}
-
-    Please format a report suggesting:
-    - How to remove the dead code safely.
-    - How to refactor the code smells into reusable components (e.g., Page Objects).
-    - Identify any missing assertions or bad locator practices.
+    CODE SMELLS IN {test_file}:
+    {smells}
+    
+    Provide clear refactoring steps.
     """
 
-    # 4. Get AI Insights
-    print("Sending data to Gemini for analysis...")
     response = client.models.generate_content(
         model="gemini-2.0-flash",
-        contents=prompt
+        contents=final_prompt
     )
 
-    # 5. Save to your reports folder
-    os.makedirs("source/reports", exist_ok=True)
-    with open("source/reports/report.md", "w") as f:
-        f.write("# AI Test Maintenance Analysis Report\n\n")
+    # 4. Save the report to the path shown in your screenshot
+    report_path = "source/reports/report.md"
+    os.makedirs(os.path.dirname(report_path), exist_ok=True)
+    with open(report_path, "w") as f:
         f.write(response.text)
     
-    print("POC Successful: Report saved to source/reports/report.md")
+    print(f"✅ POC Complete! Report generated at {report_path}")
 
 if __name__ == "__main__":
-    generate_ai_maintenance_report()
+    main()
