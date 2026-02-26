@@ -28,7 +28,7 @@ jobs:
     - name: Run AI Maintenance Analysis
       env:
         # You'll need to add your API key to GitHub Repo Secrets
-        GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        GOOGLE_API_KEY: ${{ secrets.GEMINI_API_KEY }}
       run: python source/ai_analyzer/main.py
 
     - name: Upload AI Report
