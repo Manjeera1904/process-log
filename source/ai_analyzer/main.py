@@ -1,69 +1,37 @@
 import os
-import sys
+from google import genai
+# Import your existing logic from your other files
+from dead_code_detector import detect_dead_code
+from static_analyzer import run_static_analysis
 
-# 1. Setup paths
-CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
-sys.path.append(CURRENT_DIR)
+client = genai.Client(api_key="AIzaSyDd1v3JL25BSDFgom5lVm1cUbtVopLR2Ik")
 
-from static_analyzer import analyze_file
-from duplication_detector import detect_duplicates
-from dead_code_detector import detect_unused_files
+def generate_ai_maintenance_report():
+    # 1. Get data from your existing python scripts
+    dead_code_results = detect_dead_code()
+    static_smells = run_static_analysis()
 
-# Ensure we are at the root
-REPO_ROOT = os.environ.get('GITHUB_WORKSPACE', os.path.abspath(os.path.join(CURRENT_DIR, "../../")))
-REPORT_DIR = os.path.join(REPO_ROOT, "source", "reports")
-REPORT_PATH = os.path.join(REPORT_DIR, "report.md")
-
-def run_pipeline():
-    os.makedirs(REPORT_DIR, exist_ok=True)
-    report = ["# 🤖 AI Test Maintenance Report\n"]
-    report.append("## 🔍 Files Scanned\n")
+    # 2. Construct the prompt for Gemini
+    prompt = f"""
+    Analyze the following QA Automation findings and provide refactoring suggestions:
     
-    print(f"🚀 Starting scan at: {REPO_ROOT}")
-    
-    found_any_files = False
+    DEAD CODE FOUND: {dead_code_results}
+    CODE SMELLS: {static_smells}
 
-    # 2. AI Analysis Loop
-    for root, dirs, files in os.walk(REPO_ROOT):
-        # Skip system folders
-        if any(ignored in root for ignored in [".git", "__pycache__", "node_modules", "ai_analyzer", "reports"]):
-            continue
-            
-        for file in files:
-            # Check for Python, JS, TS (Add others if needed)
-            if file.endswith((".py", ".js", ".ts")):
-                found_any_files = True
-                path = os.path.join(root, file)
-                rel_path = os.path.relpath(path, REPO_ROOT)
-                
-                print(f"📄 Found file: {rel_path} - Sending to AI...")
-                
-                try:
-                    issues = analyze_file(path)
-                    if "No issues" in issues or not issues.strip():
-                        report.append(f"### ✅ {rel_path}\n* Status: Clean\n")
-                    else:
-                        report.append(f"### ❌ {rel_path}\n{issues}\n")
-                except Exception as e:
-                    print(f"   ⚠️ Error: {e}")
+    Please format a report suggesting:
+    - How to remove the dead code safely.
+    - How to refactor the code smells into reusable components.
+    """
 
-    if not found_any_files:
-        print("❌ No test files found! Check your folder structure.")
-        report.append("> ⚠️ No supported files (.py, .js, .ts) were found in the repository.")
+    # 3. Get AI Insights
+    response = client.models.generate_content(
+        model="gemini-2.0-flash",
+        contents=prompt
+    )
 
-    # 3. Standard Detectors
-    report.append("\n---\n## ⚙️ Maintenance Checks")
-    
-    dupes = detect_duplicates(REPO_ROOT)
-    report.append(f"\n### 🔁 Duplicates\n" + ("\n".join([f"- {d}" for d in dupes]) if dupes else "No duplicates found."))
-
-    unused = detect_unused_files(REPO_ROOT)
-    report.append(f"\n### 🗑️ Unused Code\n" + ("\n".join([f"- {u}" for u in unused]) if unused else "No unused files found."))
-
-    # 4. Save
-    with open(REPORT_PATH, "w", encoding="utf-8") as f:
-        f.write("\n".join(report))
-    print(f"✅ Report saved to: {REPORT_PATH}")
+    # 4. Save to your reports folder (as seen in your screenshot)
+    with open("source/reports/report.md", "w") as f:
+        f.write(response.text)
 
 if __name__ == "__main__":
-    run_pipeline()
+    generate_ai_maintenance_report()
